@@ -4,7 +4,10 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.googleServices)
     id("dev.icerock.mobile.multiplatform-resources")
+
 }
 
 kotlin {
@@ -35,6 +38,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(project.dependencies.platform("com.google.firebase:firebase-bom:30.0.1"))
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -47,13 +51,56 @@ kotlin {
             implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
             api("dev.icerock.moko:resources:0.23.0")
             api("dev.icerock.moko:resources-compose:0.23.0")
+            implementation("io.coil-kt.coil3:coil-core:3.0.0-alpha06")
+            implementation("io.coil-kt.coil3:coil-compose-core:3.0.0-alpha06")
+            implementation("io.coil-kt.coil3:coil-network-ktor:3.0.0-alpha06")
+            implementation("io.github.alexzhirkevich:cupertino:0.1.0-alpha03")
+            implementation("io.github.alexzhirkevich:cupertino-decompose:0.1.0-alpha03")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            implementation("dev.gitlive:firebase-firestore:1.11.1")
+            implementation("dev.gitlive:firebase-common:1.11.1")
+            implementation("dev.icerock.moko:mvvm-core:0.16.1")
+            implementation("dev.icerock.moko:mvvm-compose:0.16.1")
 
+            ///// KOIN /////
+            implementation(project.dependencies.platform("io.insert-koin:koin-bom:3.5.3"))
+            implementation("io.insert-koin:koin-core")
+            implementation("io.insert-koin:koin-compose")
+
+            //// DECOMPOSE NAVIGATION LIBRARY ////
+            implementation(libs.decompose.decompose)
+            implementation(libs.decompose.extensionsComposeJetbrains)
+            implementation(libs.kotlinx.serialization.json)
         }
+
+        val iosX64Main by getting {
+            resources.srcDirs("build/generated/moko/iosX64Main/src")
+        }
+        val iosArm64Main by getting {
+            resources.srcDirs("build/generated/moko/iosArm64Main/src")
+        }
+        val iosSimulatorArm64Main by getting {
+            resources.srcDirs("build/generated/moko/iosSimulatorArm64Main/src")
+        }
+
+        val iosMain by creating {
+            dependsOn(commonMain.get())
+            this.dependencies {
+                implementation(libs.ktor.client.darwin)
+
+            }
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+        }
+
+
+
     }
 }
 
 android {
-    namespace = "org.example.iguhallee"
+    namespace = "com.ramaas.iguhallee"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -61,7 +108,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "org.example.iguhallee"
+        applicationId = "com.ramaas.iguhallee"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -83,11 +130,16 @@ android {
     }
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
+        implementation("com.google.firebase:firebase-common-ktx:20.3.3")
+        /////// KOIN ///////
+        implementation(platform("io.insert-koin:koin-bom:3.5.3"))
+        implementation("io.insert-koin:koin-core")
+        implementation("io.insert-koin:koin-android")
     }
 }
 
 multiplatformResources {
-    multiplatformResourcesPackage = "org.example.iguhallee" // required
+    multiplatformResourcesPackage = "com.ramaas.iguhallee" // required
     multiplatformResourcesClassName = "MR"
 }
 

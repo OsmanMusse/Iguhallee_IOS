@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.painterResource
-import org.example.iguhallee.MR
+import com.ramaas.iguhallee.MR
 
 @Composable
 fun CustomTopAppBar(){

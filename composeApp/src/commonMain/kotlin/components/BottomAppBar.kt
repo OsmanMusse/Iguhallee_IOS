@@ -18,7 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import org.example.iguhallee.MR
+import com.ramaas.iguhallee.MR
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import dev.icerock.moko.resources.compose.painterResource
 

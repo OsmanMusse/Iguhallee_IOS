@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "145919975707",
+    "firebase_url": "https://iguhallee-d14f5-default-rtdb.firebaseio.com",
+    "project_id": "iguhallee-d14f5",
+    "storage_bucket": "iguhallee-d14f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145919975707:android:69f89aff3d75c19f2973be",
+        "android_client_info": {
+          "package_name": "com.iguhallee.homescreenactivity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145919975707-n4rhcof6gnn06v85psnq6m8puaa4v6ar.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iguhallee.homescreenactivity",
+            "certificate_hash": "60828964f2a0bcefa2795705deb657dba97b5b23"
+          }
+        },
+        {
+          "client_id": "145919975707-2vg85kcejir0s6s3t814hpvs3dvcfd06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAF3ElGwH9fJEZUMpwr1l067PQk0QSJvrA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145919975707-2vg85kcejir0s6s3t814hpvs3dvcfd06.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "145919975707-6v3kkaospoeell3f8jfajq32najsuaec.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ramaas.iguhallee"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145919975707:android:41da25c86c63671b2973be",
+        "android_client_info": {
+          "package_name": "com.ramaas.iguhallee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145919975707-2vg85kcejir0s6s3t814hpvs3dvcfd06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAF3ElGwH9fJEZUMpwr1l067PQk0QSJvrA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "145919975707-2vg85kcejir0s6s3t814hpvs3dvcfd06.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "145919975707-6v3kkaospoeell3f8jfajq32najsuaec.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ramaas.iguhallee"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
