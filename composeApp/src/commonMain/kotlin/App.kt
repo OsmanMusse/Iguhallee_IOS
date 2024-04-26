@@ -1,51 +1,46 @@
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.StackAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimator
-import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
-import domain.model.PostStatus
+import com.arkivanov.essenty.backhandler.BackHandler
+import decompose.root.RootComponent
 import io.github.alexzhirkevich.cupertino.decompose.NativeChildren
 import io.github.alexzhirkevich.cupertino.decompose.cupertinoPredictiveBackAnimation
-import navigation.RootComponent
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import screens.MainScreen.HomeScreen
-import screens.PostDetailScreen.PostDetailScreen
+import screens.HomeScreen.MainScreen
 
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 @Preview
 fun App(rootComponent: RootComponent) {
-    val childStack by rootComponent.childStack.subscribeAsState()
 
-    NativeChildren(
-        stack = rootComponent.childStack,
+    println("Child Created == 2")
+
+    val childStack = rootComponent.routerState
+
+
+    Children(
+        stack = childStack,
         modifier = Modifier.fillMaxSize(),
-        backDispatcher = rootComponent.backDispatcher,
-        animation = cupertinoPredictiveBackAnimation(
+        animation = backAnimation(
             backHandler = rootComponent.backDispatcher,
-            onBack = { rootComponent.onBack()},
+            onBack = { println("DO SOMETHING 1")}
         ),
         content = { child ->
-            when(val instance = child.instance){
-                is RootComponent.Child.HomeScreen -> HomeScreen(instance.component)
-                is RootComponent.Child.ScreenB -> PostDetailScreen(instance.component)
-            }
+            println("Child Created == ")
+           when(val childCreated = child.instance){
+               is RootComponent.RootChild.LandingRoot -> Unit
+               is RootComponent.RootChild.MainRoot -> MainScreen(childCreated.mainComponent)
+           }
         }
-
     )
-//    Children(
-//        stack = childStack,
-//        animation = stackAnimation(slide())
-//    ){ child ->
-//        when(val instance = child.instance){
-//            is RootComponent.Child.HomeScreen -> HomeScreen(instance.component)
-//            is RootComponent.Child.ScreenB -> PostDetailScreen(instance.component)
-//        }
-//    }
 }
+
+

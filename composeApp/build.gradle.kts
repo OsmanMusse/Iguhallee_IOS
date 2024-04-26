@@ -29,10 +29,13 @@ kotlin {
             isStatic = true
             export("dev.icerock.moko:resources:0.23.0")
             export("dev.icerock.moko:graphics:0.9.0")
-
+            export("com.arkivanov.decompose:decompose:2.2.2-compose-experimental")
+            export("com.arkivanov.decompose:extensions-compose-jetbrains:2.2.2-compose-experimental")
+            export(libs.essenty.backHandler)
         }
     }
-    
+
+
     sourceSets {
         
         androidMain.dependencies {
@@ -70,6 +73,7 @@ kotlin {
             //// DECOMPOSE NAVIGATION LIBRARY ////
             implementation(libs.decompose.decompose)
             implementation(libs.decompose.extensionsComposeJetbrains)
+            implementation("com.arkivanov.essenty:lifecycle-coroutines:2.0.0-alpha01")
             implementation(libs.kotlinx.serialization.json)
         }
 
@@ -87,7 +91,8 @@ kotlin {
             dependsOn(commonMain.get())
             this.dependencies {
                 implementation(libs.ktor.client.darwin)
-
+                api("com.arkivanov.decompose:decompose:2.2.2-compose-experimental")
+                api("com.arkivanov.decompose:extensions-compose-jetbrains:2.2.2-compose-experimental")
             }
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)

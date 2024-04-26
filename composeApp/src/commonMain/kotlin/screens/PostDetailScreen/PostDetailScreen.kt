@@ -10,11 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import io.github.alexzhirkevich.cupertino.CupertinoButton
-import navigation.PostDetailScreenComponent
-import navigation.RootComponent
+import navigation.PostDetailComponent
 
 @Composable
-fun PostDetailScreen(rootComponent: PostDetailScreenComponent){
+fun PostDetailScreen(rootComponent: PostDetailComponent){
     Column(
         modifier = Modifier.fillMaxSize().background(Color.Blue),
         verticalArrangement = Arrangement.Center,

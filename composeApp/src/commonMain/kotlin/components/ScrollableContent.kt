@@ -1,6 +1,5 @@
 package components
 
-import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
@@ -45,19 +44,18 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import com.ramaas.iguhallee.MR
+import decompose.home.HomeListComponent
 import dev.icerock.moko.resources.compose.painterResource
 import domain.model.Post
 import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
-import navigation.HomeScreenComponent
-import navigation.HomeScreenEvent
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalCupertinoApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ScrollableContent(
     postData: List<Post>,
     calculateBottomPadding: Dp,
-    component: HomeScreenComponent
+    component: HomeListComponent
 ) {
 
         LazyVerticalGrid(
@@ -79,7 +77,7 @@ fun ScrollableContent(
             items(postData.size) { index ->
                 ScrollableMainContent(postData,index, onclick = {
                     println("POST CLICKEED == ${index}")
-                    component.onEvent(HomeScreenEvent.navigationToPost)
+                    component.goToDetailsScreen()
                 })
             }
         }

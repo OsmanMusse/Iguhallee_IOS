@@ -1,24 +1,43 @@
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.interop.UIKitViewController
+
 import androidx.compose.ui.window.ComposeUIViewController
-import kotlinx.cinterop.ExperimentalForeignApi
-import platform.UIKit.UIViewController
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import navigation.RootComponent
+import com.arkivanov.decompose.extensions.compose.jetbrains.PredictiveBackGestureOverlay
+import com.arkivanov.essenty.backhandler.BackDispatcher
+import decompose.root.DefaultRootComponent
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
+import org.koin.compose.getKoin
 
-@OptIn(ExperimentalForeignApi::class)
 
-fun MainViewController() = ComposeUIViewController {
-   val root = remember { RootComponent(DefaultComponentContext(lifecycle = LifecycleRegistry())) }
-   App(root)
+fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController {
+
+
+
+    println("Running root 1")
+   val getKoinA = getKoin()
+
+    println("Running root 2")
+
+    PredictiveBackGestureOverlay(
+        backDispatcher = backDispatcher,
+        backIcon = null,
+        modifier = Modifier.fillMaxSize(),
+        onClose = { println("ON CLOSE CALLED ===") }
+    ){
+        val root = remember {
+            DefaultRootComponent(
+                componentContext = DefaultComponentContext(lifecycle = LifecycleRegistry()),
+                homeScreenFactory = getKoinA.get()
+            )
+        }
+
+        App(root)
+    }
+
+
+
+
+
 }

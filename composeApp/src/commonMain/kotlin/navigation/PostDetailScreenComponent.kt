@@ -2,7 +2,9 @@ package navigation
 
 import com.arkivanov.decompose.ComponentContext
 
-class  PostDetailScreenComponent (
+
+
+class  PostDetailComponent (
     val text: String,
     private val onGoBack: () -> Unit,
     componentContext: ComponentContext
