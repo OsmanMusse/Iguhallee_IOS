@@ -29,10 +29,6 @@ fun App(rootComponent: RootComponent) {
     Children(
         stack = childStack,
         modifier = Modifier.fillMaxSize(),
-        animation = backAnimation(
-            backHandler = rootComponent.backDispatcher,
-            onBack = { println("DO SOMETHING 1")}
-        ),
         content = { child ->
             println("Child Created == ")
            when(val childCreated = child.instance){

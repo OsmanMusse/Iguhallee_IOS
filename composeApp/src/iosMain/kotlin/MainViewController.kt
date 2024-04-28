@@ -8,9 +8,12 @@ import com.arkivanov.essenty.backhandler.BackDispatcher
 import decompose.root.DefaultRootComponent
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.lifecycle.ApplicationLifecycle
 import org.koin.compose.getKoin
 
 
+@OptIn(ExperimentalDecomposeApi::class)
 fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController {
 
 
@@ -28,7 +31,7 @@ fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController
     ){
         val root = remember {
             DefaultRootComponent(
-                componentContext = DefaultComponentContext(lifecycle = LifecycleRegistry()),
+                componentContext = DefaultComponentContext(lifecycle = ApplicationLifecycle()),
                 homeScreenFactory = getKoinA.get()
             )
         }

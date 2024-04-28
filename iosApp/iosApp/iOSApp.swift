@@ -5,7 +5,7 @@ import ComposeApp
 @main
 struct iOSApp: App {
     init() {
-        FirebaseApp.configure()
+//        FirebaseApp.configure()
         DependencyInjectionKt.doInitIOS()
     }
  
@@ -19,6 +19,7 @@ struct iOSApp: App {
 
 class AppDelegate:NSObject, UIApplicationDelegate {
     var backDispatcher: BackDispatcher = BackDispatcherKt.BackDispatcher()
+    
     
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {

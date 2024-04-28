@@ -13,9 +13,9 @@ import org.koin.dsl.module
 
 val commonModule = module {
 
-    single { Firebase.firestore}
+//    single { Firebase.firestore}
     single<PostRepository> {
-        PostRepository_Impl(get())
+        PostRepository_Impl(null)
     }
 
     single {
