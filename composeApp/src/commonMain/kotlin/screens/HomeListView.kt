@@ -1,12 +1,21 @@
 package screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -20,12 +29,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
@@ -38,18 +49,22 @@ import components.pullRefresh.PullToRefreshLayoutState
 import components.pullRefresh.RefreshIndicatorState
 import decompose.home.HomeListComponent
 import dev.icerock.moko.resources.compose.painterResource
+import io.github.alexzhirkevich.cupertino.CupertinoActivityIndicator
 import io.github.alexzhirkevich.cupertino.CupertinoTopAppBar
 import io.github.alexzhirkevich.cupertino.CupertinoTopAppBarDefaults
+import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalCupertinoApi::class,
+    ExperimentalAnimationApi::class
+)
 @Composable
 fun HomeListView(component: HomeListComponent) {
 
-    val state = component.state.subscribeAsState()
+    val state by component.state.subscribeAsState()
 
-    val mainColor =  Color(72, 134, 255)
+    val mainColor =  Color(71, 134, 255)
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val refreshLayoutState = remember { PullToRefreshLayoutState({"RADSADSA"}) }
@@ -168,18 +183,38 @@ fun HomeListView(component: HomeListComponent) {
     }
         }
     ) {
-        PullToRefreshLayout(
-            modifier = Modifier.fillMaxSize().padding(it),
-            pullRefreshLayoutState =  refreshLayoutState,
-            onRefresh = {
-                println("REFRESHING ===")
-                scope.launch {
-                    delay(2000)
-                    refreshLayoutState.updateRefreshState(RefreshIndicatorState.Default)
+        AnimatedVisibility(
+                visible = state.isLoading,
+                enter = fadeIn(),
+                exit = fadeOut()
+        ){
+            Column(
+                modifier = Modifier.fillMaxSize().background(Color(241, 242, 243)).padding(it),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CupertinoActivityIndicator(modifier = Modifier.size(20.dp).offset(y = 15.dp))
                 }
-            },
-        ) {
-            ScrollableContent(state.value.postList,0.dp,component)
         }
+
+        AnimatedVisibility(
+            visible = !state.isLoading,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ){
+            PullToRefreshLayout(
+                modifier = Modifier.fillMaxSize().padding(it),
+                pullRefreshLayoutState =  refreshLayoutState,
+                onRefresh = {
+                    println("REFRESHING ===")
+                    scope.launch {
+                        delay(2000)
+                        refreshLayoutState.updateRefreshState(RefreshIndicatorState.Default)
+                    }
+                },
+            ) {
+                ScrollableContent(state.postList,component)
+            }
+        }
+
     }
 }

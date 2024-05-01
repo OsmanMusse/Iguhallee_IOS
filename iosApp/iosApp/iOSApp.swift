@@ -5,7 +5,7 @@ import ComposeApp
 @main
 struct iOSApp: App {
     init() {
-//        FirebaseApp.configure()
+        FirebaseApp.configure()
         DependencyInjectionKt.doInitIOS()
     }
  

@@ -2,6 +2,7 @@ package decompose.home
 
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.active
@@ -10,6 +11,7 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackDispatcher
@@ -17,6 +19,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import domain.model.HomeScreenState
 import kotlinx.serialization.Serializable
 import navigation.PostDetailComponent
+import kotlin.random.Random
 
 
 class HomeScreenComponent(
@@ -92,6 +95,7 @@ class HomeScreenComponent(
             onGoBack = { println("Go Back to HomeScreen Component ===") }
         )
     }
+    @OptIn(ExperimentalDecomposeApi::class)
     private fun createTab(config: TabConfig, componentContext: ComponentContext): TabComponent {
         return tabFactory.create(
             componentContext = componentContext,

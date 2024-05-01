@@ -6,6 +6,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import domain.model.HomeScreenState
 import domain.repository.PostRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class HomeListComponent(
@@ -34,6 +35,7 @@ class HomeListComponent(
         coroutineScope().launch {
             _state.value = _state.value.copy(isLoading = true)
             val request = repo.getAllPosts()
+            delay(2000)
             _state.value = _state.value.copy(isLoading = false, postList = request)
         }
 

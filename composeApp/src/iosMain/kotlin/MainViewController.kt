@@ -31,7 +31,7 @@ fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController
     ){
         val root = remember {
             DefaultRootComponent(
-                componentContext = DefaultComponentContext(lifecycle = ApplicationLifecycle()),
+                componentContext = DefaultComponentContext(lifecycle = ApplicationLifecycle(), backHandler = backDispatcher),
                 homeScreenFactory = getKoinA.get()
             )
         }

@@ -30,6 +30,7 @@
 		D38843172BB8EA6D00B4447B /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = D38843162BB8EA6D00B4447B /* FirebaseStorage */; };
 		D38843192BB8EA6D00B4447B /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D38843182BB8EA6D00B4447B /* FirebaseStorageCombine-Community */; };
 		D388431B2BC301B200B4447B /* Koin.swift in Sources */ = {isa = PBXBuildFile; fileRef = D388431A2BC301B200B4447B /* Koin.swift */; };
+		D3F23BEC2BDE7D0100B95621 /* GoogleService-Info.plist in Sources */ = {isa = PBXBuildFile; fileRef = D3F23BEB2BDE79D600B95621 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		D388431A2BC301B200B4447B /* Koin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Koin.swift; sourceTree = "<group>"; };
+		D3F23BEB2BDE79D600B95621 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				D3F23BEB2BDE79D600B95621 /* GoogleService-Info.plist */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
@@ -259,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3F23BEC2BDE7D0100B95621 /* GoogleService-Info.plist in Sources */,
 				D388431B2BC301B200B4447B /* Koin.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,

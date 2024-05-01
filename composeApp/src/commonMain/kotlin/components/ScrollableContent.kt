@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -54,7 +55,6 @@ import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 @Composable
 fun ScrollableContent(
     postData: List<Post>,
-    calculateBottomPadding: Dp,
     component: HomeListComponent
 ) {
 
@@ -62,12 +62,11 @@ fun ScrollableContent(
             columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = calculateBottomPadding)
                 .background(Color(241, 242, 243))
                 .pullRefresh(rememberPullRefreshState(refreshing = true, onRefresh = {})),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(horizontal = 10.dp)
+            contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 60.dp)
 
         ) {
             item(span = { GridItemSpan(2) }) {

@@ -38,6 +38,7 @@ import io.github.alexzhirkevich.cupertino.CupertinoSheetState
 import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import io.github.alexzhirkevich.cupertino.decompose.NativeChildren
 import com.arkivanov.essenty.backhandler.BackHandler
+import io.github.alexzhirkevich.cupertino.decompose.cupertinoPredictiveBackAnimation
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -54,10 +55,10 @@ import kotlinx.coroutines.CoroutineScope
      Children(
          stack = component.fullScreenStack,
          modifier = Modifier.fillMaxSize(),
-         animation = backAnimation(
+         animation = cupertinoPredictiveBackAnimation(
              backHandler = component.backHandler,
              onBack = {
-                 println("DO SOMETHING")
+                 component.onBack()
              }
          ),
      ) {
