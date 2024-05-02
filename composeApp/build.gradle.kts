@@ -65,6 +65,9 @@ kotlin {
             implementation("dev.icerock.moko:mvvm-core:0.16.1")
             implementation("dev.icerock.moko:mvvm-compose:0.16.1")
 
+            ///// Coroutines /////
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta")
+
             ///// KOIN /////
             implementation(project.dependencies.platform("io.insert-koin:koin-bom:3.5.3"))
             implementation("io.insert-koin:koin-core")
@@ -75,6 +78,9 @@ kotlin {
             implementation(libs.decompose.extensionsComposeJetbrains)
             implementation("com.arkivanov.essenty:lifecycle-coroutines:2.0.0-alpha01")
             implementation(libs.kotlinx.serialization.json)
+
+            //// CASHAPP MULTIPLATFORM PAGING ////
+            implementation("app.cash.paging:paging-compose-common:3.3.0-alpha02-0.5.1")
         }
 
         val iosX64Main by getting {

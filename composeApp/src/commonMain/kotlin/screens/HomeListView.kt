@@ -56,9 +56,8 @@ import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalCupertinoApi::class,
-    ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalCupertinoApi::class)
+
 @Composable
 fun HomeListView(component: HomeListComponent) {
 
@@ -212,7 +211,7 @@ fun HomeListView(component: HomeListComponent) {
                     }
                 },
             ) {
-                ScrollableContent(state.postList,component)
+                ScrollableContent(component)
             }
         }
 

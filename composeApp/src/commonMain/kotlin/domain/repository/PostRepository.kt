@@ -1,7 +1,9 @@
 package domain.repository
 
+import app.cash.paging.PagingData
 import domain.model.Post
+import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
-    suspend fun getAllPosts(): List<Post>
+    suspend fun getAllPosts(): Flow<PagingData<Post>>
 }

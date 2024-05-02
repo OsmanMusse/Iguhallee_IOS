@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -40,6 +42,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.PagingSource
+import app.cash.paging.LoadState
+import app.cash.paging.compose.collectAsLazyPagingItems
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -54,10 +59,23 @@ import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ScrollableContent(
-    postData: List<Post>,
     component: HomeListComponent
 ) {
 
+
+
+    val pagingPosts = component.posts.collectAsLazyPagingItems()
+
+//    when(pagingPosts.loadState.append){
+//        is androidx.paging.LoadState.Loading -> println("PAGING STATE == LOADING")
+//        is androidx.paging.LoadState.NotLoading -> println("PAGING STATE == NOT LOADING")
+//        is androidx.paging.LoadState.Error -> println("PAGING STATE == ERROR")
+//    }
+
+    println("PAGING COUNT == ${pagingPosts.itemCount}")
+//    println("${pagingPosts.itemSnapshotList.forEach {
+//        println("POST TITLE == ${it?.title}")
+//    }}")
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
@@ -73,8 +91,10 @@ fun ScrollableContent(
                 ScrollableContentHeader()
             }
 
-            items(postData.size) { index ->
-                ScrollableMainContent(postData,index, onclick = {
+
+            items(pagingPosts.itemCount) { index ->
+                val specificPost = pagingPosts[index]
+                ScrollableMainContent(specificPost!!,index, onclick = {
                     println("POST CLICKEED == ${index}")
                     component.goToDetailsScreen()
                 })
@@ -85,7 +105,7 @@ fun ScrollableContent(
 
 
 @Composable
-fun ScrollableMainContent(postData: List<Post>, index: Int,onclick:(index:Int) -> Unit){
+fun ScrollableMainContent(postData: Post, index: Int,onclick:(index:Int) -> Unit){
 
 
     var isBtnActive by remember{ mutableStateOf(false) }
@@ -107,7 +127,7 @@ fun ScrollableMainContent(postData: List<Post>, index: Int,onclick:(index:Int) -
     ){
         AsyncImage(
             model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data("${postData.get(index).postImgs.first()}")
+                .data("${postData.postImgs.first()}")
                 .build(),
             contentDescription = null,
             imageLoader = ImageLoader(context = LocalPlatformContext.current),
@@ -119,7 +139,7 @@ fun ScrollableMainContent(postData: List<Post>, index: Int,onclick:(index:Int) -
             modifier = Modifier
             .fillMaxWidth()
             .padding(start = 12.dp,end = 12.dp, top = 0.dp , bottom = 12.dp),
-            text = postData[index].title,
+            text = postData.title,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             fontSize = 17.sp
@@ -134,7 +154,7 @@ fun ScrollableMainContent(postData: List<Post>, index: Int,onclick:(index:Int) -
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(text = "£",fontSize = 14.5.sp)
-            Text(text = postData[index].formattedPrice,fontSize = 20.sp,fontWeight = FontWeight.SemiBold)
+            Text(text = postData.formattedPrice,fontSize = 20.sp,fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 modifier = Modifier.indication(MutableInteractionSource(),null),
