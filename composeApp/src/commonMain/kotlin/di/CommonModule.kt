@@ -22,7 +22,9 @@ val commonModule = module {
     single { Firebase.firestore}
 
     single {
-        PagingConfig(pageSize = Constants.PAGE_SIZE)
+        PagingConfig(
+            pageSize = Constants.PAGE_SIZE,
+        )
     }
 
     single<PostRepository> {

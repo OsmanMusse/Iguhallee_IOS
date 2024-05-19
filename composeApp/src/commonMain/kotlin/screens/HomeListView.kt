@@ -36,9 +36,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.cash.paging.LoadStateError
+import app.cash.paging.LoadStateLoading
+import app.cash.paging.LoadStateNotLoading
+import app.cash.paging.compose.collectAsLazyPagingItems
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.ramaas.iguhallee.MR
 import components.FlexibleTopBar
@@ -62,12 +65,14 @@ import kotlinx.coroutines.launch
 fun HomeListView(component: HomeListComponent) {
 
     val state by component.state.subscribeAsState()
+    val pagingPosts = component.posts.collectAsLazyPagingItems()
 
     val mainColor =  Color(71, 134, 255)
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val refreshLayoutState = remember { PullToRefreshLayoutState({"RADSADSA"}) }
 
+    println("IS REFRESH LOADING == ${pagingPosts.loadState.refresh is LoadStateLoading} &&  ${pagingPosts.loadState.refresh is LoadStateNotLoading}")
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -183,7 +188,7 @@ fun HomeListView(component: HomeListComponent) {
         }
     ) {
         AnimatedVisibility(
-                visible = state.isLoading,
+                visible =  pagingPosts.loadState.refresh is LoadStateLoading && state.isInitialLoad,
                 enter = fadeIn(),
                 exit = fadeOut()
         ){
@@ -192,26 +197,27 @@ fun HomeListView(component: HomeListComponent) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CupertinoActivityIndicator(modifier = Modifier.size(20.dp).offset(y = 15.dp))
-                }
+            }
         }
 
         AnimatedVisibility(
-            visible = !state.isLoading,
+            visible = pagingPosts.loadState.refresh is LoadStateNotLoading || pagingPosts.loadState.refresh is LoadStateError || (pagingPosts.loadState.refresh is LoadStateLoading && !state.isInitialLoad),
             enter = fadeIn(),
             exit = fadeOut()
         ){
             PullToRefreshLayout(
                 modifier = Modifier.fillMaxSize().padding(it),
-                pullRefreshLayoutState =  refreshLayoutState,
+                pullRefreshLayoutState = refreshLayoutState,
                 onRefresh = {
                     println("REFRESHING ===")
+                    pagingPosts.refresh()
                     scope.launch {
                         delay(2000)
                         refreshLayoutState.updateRefreshState(RefreshIndicatorState.Default)
                     }
                 },
             ) {
-                ScrollableContent(component)
+                ScrollableContent(component,pagingPosts)
             }
         }
 

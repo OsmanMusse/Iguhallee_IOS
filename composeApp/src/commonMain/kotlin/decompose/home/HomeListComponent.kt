@@ -11,7 +11,6 @@ import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import domain.model.HomeScreenState
 import domain.model.Post
 import domain.repository.PostRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,8 +24,7 @@ class HomeListComponent(
 
     private val _state = MutableValue(HomeScreenState())
 
-
-    val componentScope = coroutineScope()
+    private val componentScope = coroutineScope()
 
     val state: Value<HomeScreenState> get() =  _state
 
@@ -40,29 +38,22 @@ class HomeListComponent(
     }
 
 
-
     fun goToDetailsScreen(){
-
         onPushScreen("Go to the details screen")
     }
 
     private fun retrievePosts(){
-
-        componentScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-//            delay(2000)
-            _state.value = _state.value.copy(isLoading = false)
-            repo.getAllPosts().cachedIn(componentScope).collect { pagingData ->
-               _posts.value = pagingData
-            }
-        }
+       componentScope.launch {
+           repo.getAllPosts().cachedIn(componentScope).collect { pagingData ->
+              _posts.value = pagingData
+           }
+       }
     }
 
 
-class Factory(
+ class Factory(
     private val repo: PostRepository
-){
-
+ ){
     fun create(
         componentContext: ComponentContext,
         onPushScreen: (String) -> Unit
@@ -71,8 +62,5 @@ class Factory(
         repo = repo,
         onPushScreen = onPushScreen
     )
-
-}
-
-
-}
+  }
+ }

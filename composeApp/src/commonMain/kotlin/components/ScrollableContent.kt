@@ -1,5 +1,6 @@
 package components
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
@@ -11,14 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -29,77 +27,122 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.paging.PagingSource
-import app.cash.paging.LoadState
+import app.cash.paging.LoadStateError
+import app.cash.paging.LoadStateLoading
+import app.cash.paging.LoadStateNotLoading
+import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import coil3.request.CachePolicy
 import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.ramaas.iguhallee.MR
 import decompose.home.HomeListComponent
 import dev.icerock.moko.resources.compose.painterResource
+import dev.tmapps.konnection.Konnection
 import domain.model.Post
+import io.github.alexzhirkevich.cupertino.AlertDialogActionsScope
+import io.github.alexzhirkevich.cupertino.CupertinoAlertDialog
+import io.github.alexzhirkevich.cupertino.CupertinoText
 import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
+import io.github.alexzhirkevich.cupertino.cancel
+import io.github.alexzhirkevich.cupertino.default
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalCupertinoApi::class)
 @Composable
 fun ScrollableContent(
-    component: HomeListComponent
+    component: HomeListComponent,
+    pagingPosts: LazyPagingItems<Post>
 ) {
 
 
-
-    val pagingPosts = component.posts.collectAsLazyPagingItems()
-
-//    when(pagingPosts.loadState.append){
-//        is androidx.paging.LoadState.Loading -> println("PAGING STATE == LOADING")
-//        is androidx.paging.LoadState.NotLoading -> println("PAGING STATE == NOT LOADING")
-//        is androidx.paging.LoadState.Error -> println("PAGING STATE == ERROR")
-//    }
-
-    println("PAGING COUNT == ${pagingPosts.itemCount}")
-//    println("${pagingPosts.itemSnapshotList.forEach {
-//        println("POST TITLE == ${it?.title}")
-//    }}")
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(241, 242, 243))
-                .pullRefresh(rememberPullRefreshState(refreshing = true, onRefresh = {})),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 60.dp)
-
-        ) {
-            item(span = { GridItemSpan(2) }) {
-                ScrollableContentHeader()
-            }
+    val shouldShowAlertDialog = remember { mutableStateOf(false) }
+    val state by component.state.subscribeAsState()
 
 
-            items(pagingPosts.itemCount) { index ->
-                val specificPost = pagingPosts[index]
-                ScrollableMainContent(specificPost!!,index, onclick = {
-                    println("POST CLICKEED == ${index}")
-                    component.goToDetailsScreen()
-                })
-            }
+    LaunchedEffect(pagingPosts.loadState){
+        if(pagingPosts.loadState.append is LoadStateError){
+            shouldShowAlertDialog.value = true
         }
+        else if(pagingPosts.loadState.refresh is LoadStateError){
+            shouldShowAlertDialog.value = true
+        }
+
+        else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
+            state.isInitialLoad = false
+        }
+    }
+
+
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(241, 242, 243))
+            .pullRefresh(rememberPullRefreshState(refreshing = true, onRefresh = {})),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 60.dp)
+    ) {
+        item(span = { GridItemSpan(2) }) {
+            ScrollableContentHeader()
+        }
+        items(pagingPosts.itemCount) { index ->
+            val specificPost = pagingPosts[index]
+            ScrollableMainContent(specificPost!!,index, onclick = {
+                println("POST CLICKEED == ${index}")
+                component.goToDetailsScreen()
+            })
+        }
+    }
+
+
+    if(shouldShowAlertDialog.value){
+        CupertinoAlertDialog(
+            buttons = {
+                default(
+                    onClick = {
+                        println("CANCEL BUTTON CLICKED ===")
+                        shouldShowAlertDialog.value = false
+                    },
+                    enabled = shouldShowAlertDialog.value,
+                    title = { Text("OK") }
+                )
+            },
+            onDismissRequest = { },
+            title = { },
+            message = {
+                CupertinoText(
+                    text = "The operation couldn't be completed. (unexpectedRe-sponse error 2.)",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        )
+    }
+
 
 }
 
@@ -107,8 +150,8 @@ fun ScrollableContent(
 @Composable
 fun ScrollableMainContent(postData: Post, index: Int,onclick:(index:Int) -> Unit){
 
-
     var isBtnActive by remember{ mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +175,8 @@ fun ScrollableMainContent(postData: Post, index: Int,onclick:(index:Int) -> Unit
             contentDescription = null,
             imageLoader = ImageLoader(context = LocalPlatformContext.current),
             contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxWidth().height(175.dp).padding(8.dp)
+            modifier = Modifier.fillMaxWidth().height(175.dp).padding(8.dp),
+            onState = { it.painter},
 
         )
         Text(
@@ -193,3 +237,5 @@ fun ScrollableContentHeader(){
         )
     }
 }
+
+

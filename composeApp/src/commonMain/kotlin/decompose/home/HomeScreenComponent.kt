@@ -41,8 +41,6 @@ class HomeScreenComponent(
     private val mainNavigation = StackNavigation<MainConfig>()
     private val tabNavigation = StackNavigation<TabConfig>()
 
-//    val backDispatcher : BackDispatcher = (backHandler as? BackDispatcher) ?: BackDispatcher()
-
 
     private val _fullscreenStack =
         childStack(
@@ -67,12 +65,10 @@ class HomeScreenComponent(
     val tabStack: Value<ChildStack<*, TabComponent>> get() = _tabStack
 
 
-
     fun onBack(){
-        println("GO BACK TO HOMESCREEN 1 == ${_fullscreenStack.active}")
         mainNavigation.pop()
-        println("GO BACK TO HOMESCREEN 2 == ${_fullscreenStack.active}")
     }
+
     fun onTabSelected(tab: TabComponent.Tab){
         println("Tab selected == $tab")
         tabNavigation.navigate { stack ->
@@ -95,7 +91,6 @@ class HomeScreenComponent(
             onGoBack = { println("Go Back to HomeScreen Component ===") }
         )
     }
-    @OptIn(ExperimentalDecomposeApi::class)
     private fun createTab(config: TabConfig, componentContext: ComponentContext): TabComponent {
         return tabFactory.create(
             componentContext = componentContext,

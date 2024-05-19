@@ -81,6 +81,9 @@ kotlin {
 
             //// CASHAPP MULTIPLATFORM PAGING ////
             implementation("app.cash.paging:paging-compose-common:3.3.0-alpha02-0.5.1")
+
+            // KOTLIN MULTIPLATFORM NETWORK CONNECTION
+            implementation("dev.tmapps:konnection:1.3.0")
         }
 
         val iosX64Main by getting {

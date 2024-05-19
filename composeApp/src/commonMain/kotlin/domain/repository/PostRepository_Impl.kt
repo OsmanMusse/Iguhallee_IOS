@@ -22,18 +22,15 @@ class PostRepositoryImpl(
     init {
         db.setSettings(persistenceEnabled = false)
     }
-    override suspend fun
-            getAllPosts(): Flow<PagingData<Post>> {
-
-        db.setSettings(persistenceEnabled = false)
+    override suspend fun getAllPosts(): Flow<PagingData<Post>> {
         val query = db.collection("Posts")
             .orderBy("datePosted",Direction.DESCENDING)
             .where { "status" equalTo PostStatus.APPROVED.text }
             .limit(Constants.PAGE_SIZE)
+
         return Pager(
             config = config
         ) {
-
             FirestorePagingSource(queryPostByCity = query)
         }.flow
     }

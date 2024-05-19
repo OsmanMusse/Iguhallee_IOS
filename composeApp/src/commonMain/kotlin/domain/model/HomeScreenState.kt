@@ -3,5 +3,6 @@ package domain.model
 import kotlinx.serialization.Serializable
 
 data class HomeScreenState(
-    val isLoading: Boolean = false,
+    var isInitialLoad: Boolean = true,
+    var shouldShowAlert: Boolean = false
 )
