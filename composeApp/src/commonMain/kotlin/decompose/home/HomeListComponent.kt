@@ -11,9 +11,11 @@ import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import domain.model.HomeScreenState
 import domain.model.Post
 import domain.repository.PostRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeListComponent(
@@ -34,14 +36,37 @@ class HomeListComponent(
 
     init {
        println("HOMELIST COMPONENT CREATED")
-       retrievePosts()
+        retrieveLikedPost()
+        retrievePosts()
     }
 
+    fun unsavePost(postID: Long){
+        componentScope.launch {
+            repo.deleteSavedPost(postID)
+        }
+    }
+
+     fun savePost(postID: Long){
+        componentScope.launch {
+            repo.saveLikedPost(postID)
+            repo.getAllLikedPosts().collect {
+                println("BOOKMARKED NEW POSTS == ${it}")
+            }
+        }
+    }
 
     fun goToDetailsScreen(){
         onPushScreen("Go to the details screen")
     }
 
+
+    private fun retrieveLikedPost(){
+        componentScope.launch {
+            repo.getAllLikedPosts().collect {
+               _state.value = _state.value.copy(bookmarkedPosts = it)
+            }
+        }
+    }
     private fun retrievePosts(){
        componentScope.launch {
            repo.getAllPosts().cachedIn(componentScope).collect { pagingData ->

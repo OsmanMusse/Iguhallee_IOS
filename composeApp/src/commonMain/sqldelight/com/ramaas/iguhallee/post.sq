@@ -1,0 +1,21 @@
+CREATE TABLE likedPostsEntity (
+  id INTEGER PRIMARY KEY NOT NULL,
+  postID INTEGER NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM likedPostsEntity;
+
+insertLikedPost:
+INSERT OR REPLACE
+INTO likedPostsEntity(id,postID)
+VALUES (?,?);
+
+
+deleteLikedPostById:
+DELETE FROM likedPostsEntity
+WHERE postID = :postID;
+
+clearDatabase:
+DELETE FROM likedPostsEntity;

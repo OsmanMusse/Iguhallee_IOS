@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
+    id("app.cash.sqldelight").version("2.0.1")
     id("dev.icerock.mobile.multiplatform-resources")
-
 }
 
 kotlin {
@@ -82,6 +82,11 @@ kotlin {
             //// CASHAPP MULTIPLATFORM PAGING ////
             implementation("app.cash.paging:paging-compose-common:3.3.0-alpha02-0.5.1")
 
+            // SQL DELIGHT
+            implementation("app.cash.sqldelight:runtime:2.0.1")
+
+            implementation("app.cash.sqldelight:coroutines-extensions:2.0.1")
+
             // KOTLIN MULTIPLATFORM NETWORK CONNECTION
             implementation("dev.tmapps:konnection:1.3.0")
         }
@@ -102,6 +107,7 @@ kotlin {
                 implementation(libs.ktor.client.darwin)
                 api("com.arkivanov.decompose:decompose:2.2.2-compose-experimental")
                 api("com.arkivanov.decompose:extensions-compose-jetbrains:2.2.2-compose-experimental")
+                implementation("app.cash.sqldelight:native-driver:2.0.1")
             }
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
@@ -152,8 +158,19 @@ android {
     }
 }
 
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.ramaas.iguhallee")
+            generateAsync.set(true)
+        }
+        linkSqlite.set(true)
+    }
+}
+
 multiplatformResources {
     multiplatformResourcesPackage = "com.ramaas.iguhallee" // required
     multiplatformResourcesClassName = "MR"
 }
+
 

@@ -19,19 +19,23 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.IconToggleButton
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +63,7 @@ import decompose.home.HomeListComponent
 import dev.icerock.moko.resources.compose.painterResource
 import dev.tmapps.konnection.Konnection
 import domain.model.Post
+import helpers.NoRippleTheme
 import io.github.alexzhirkevich.cupertino.AlertDialogActionsScope
 import io.github.alexzhirkevich.cupertino.CupertinoAlertDialog
 import io.github.alexzhirkevich.cupertino.CupertinoText
@@ -67,6 +72,7 @@ import io.github.alexzhirkevich.cupertino.cancel
 import io.github.alexzhirkevich.cupertino.default
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalCupertinoApi::class)
@@ -87,6 +93,7 @@ fun ScrollableContent(
         }
         else if(pagingPosts.loadState.refresh is LoadStateError){
             shouldShowAlertDialog.value = true
+            state.isInitialLoad = false
         }
 
         else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
@@ -111,7 +118,10 @@ fun ScrollableContent(
         }
         items(pagingPosts.itemCount) { index ->
             val specificPost = pagingPosts[index]
-            ScrollableMainContent(specificPost!!,index, onclick = {
+            ScrollableMainContent(
+                component = component,
+                postData =  specificPost!!,index,
+                onclick = {
                 println("POST CLICKEED == ${index}")
                 component.goToDetailsScreen()
             })
@@ -148,9 +158,10 @@ fun ScrollableContent(
 
 
 @Composable
-fun ScrollableMainContent(postData: Post, index: Int,onclick:(index:Int) -> Unit){
+fun ScrollableMainContent(component: HomeListComponent, postData: Post, index: Int,onclick:(index:Int) -> Unit){
 
-    var isBtnActive by remember{ mutableStateOf(false) }
+    val state by component.state.subscribeAsState()
+    var isLoveToggled by rememberSaveable { mutableStateOf(state.bookmarkedPosts.contains(postData.id)) }
 
     Card(
         modifier = Modifier
@@ -200,20 +211,25 @@ fun ScrollableMainContent(postData: Post, index: Int,onclick:(index:Int) -> Unit
             Text(text = "£",fontSize = 14.5.sp)
             Text(text = postData.formattedPrice,fontSize = 20.sp,fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                modifier = Modifier.indication(MutableInteractionSource(),null),
-                onClick = {
-                    isBtnActive = !isBtnActive
-                },
-                interactionSource = MutableInteractionSource()
-            ){
-                Icon(
-                    modifier = Modifier.size(22.dp),
-                    painter = if(isBtnActive) painterResource(MR.images.love_icon_active) else painterResource(MR.images.love_icon),
-                    contentDescription = null,
-                    tint = if (isBtnActive) Color(255, 117, 109) else Color(131, 139, 151),
-                )
+            CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme){
+                IconToggleButton(
+                    checked = isLoveToggled,
+                    onCheckedChange = {
+                        isLoveToggled = !isLoveToggled
+                        if (isLoveToggled) component.savePost(postData.id)
+                        else component.unsavePost(postData.id)
+                    }
+                ){
+                    Icon(
+                        modifier = Modifier.size(22.dp),
+                        painter = if(isLoveToggled) painterResource(MR.images.love_icon_active) else painterResource(MR.images.love_icon),
+                        contentDescription = null,
+                        tint = if (isLoveToggled) Color(255, 117, 109) else Color(131, 139, 151),
+                    )
+                }
             }
+
+
         }
     }
 

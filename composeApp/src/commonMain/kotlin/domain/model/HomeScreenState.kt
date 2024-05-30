@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 data class HomeScreenState(
     var isInitialLoad: Boolean = true,
-    var shouldShowAlert: Boolean = false
+    var shouldShowAlert: Boolean = false,
+    var bookmarkedPosts: List<Long> = emptyList()
 )

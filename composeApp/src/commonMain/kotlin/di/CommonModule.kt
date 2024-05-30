@@ -1,7 +1,9 @@
 package di
 
+import DatabaseDriverFactory
 import app.cash.paging.PagingConfig
 import core.Constants
+import createDatabase
 import decompose.home.HomeListComponent
 import decompose.home.HomeScreenComponent
 import decompose.home.TabComponent
@@ -21,6 +23,8 @@ val commonModule = module {
 
     single { Firebase.firestore}
 
+    single { DatabaseDriverFactory().create() }
+
     single {
         PagingConfig(
             pageSize = Constants.PAGE_SIZE,
@@ -29,7 +33,8 @@ val commonModule = module {
 
     single<PostRepository> {
         PostRepositoryImpl(
-            db = get(),
+            remoteDB = get(),
+            localDB = createDatabase(DatabaseDriverFactory()),
             config = get()
         )
     }
