@@ -1,7 +1,6 @@
 package screens
 
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -16,12 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import backAnimation
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.StackAnimation
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
-import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.ramaas.iguhallee.MR
 import decompose.home.HomeScreenComponent
 import decompose.home.TabComponent
@@ -33,18 +29,14 @@ import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetScaffold
 import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetScaffoldState
 import io.github.alexzhirkevich.cupertino.CupertinoButton
 import io.github.alexzhirkevich.cupertino.CupertinoNavigationBar
-import io.github.alexzhirkevich.cupertino.CupertinoScaffold
 import io.github.alexzhirkevich.cupertino.CupertinoSheetState
 import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
-import io.github.alexzhirkevich.cupertino.decompose.NativeChildren
-import com.arkivanov.essenty.backhandler.BackHandler
 import io.github.alexzhirkevich.cupertino.decompose.cupertinoPredictiveBackAnimation
 import kotlinx.coroutines.CoroutineScope
+import screens.PostDetailScreen.PostDetailScreen
 
 
-
-
- @OptIn(ExperimentalCupertinoApi::class, ExperimentalDecomposeApi::class)
+@OptIn(ExperimentalCupertinoApi::class, ExperimentalDecomposeApi::class)
  @Composable
  fun BottomNavigationView(
     component: HomeScreenComponent,
@@ -149,17 +141,19 @@ import kotlinx.coroutines.CoroutineScope
                   }
               }
               is HomeScreenComponent.FullScreenChild.PostScreen ->
-                  CupertinoScaffold(containerColor = Color.Blue,modifier = Modifier.fillMaxSize()){
-                      CupertinoButton(
-                          modifier = Modifier.offset(y = 50.dp).background(Color.Blue),
-                          onClick = {
-                              println("BACK BUTTON CLICKED ===")
-                              component.onBack()
-                          }
-                      ){
-                          Text("Go Back",color = Color.White)
-                      }
-                  }
+//                  CupertinoScaffold(containerColor = Color.Blue,modifier = Modifier.fillMaxSize()){
+//                      CupertinoButton(
+//                          modifier = Modifier.offset(y = 50.dp).background(Color.Blue),
+//                          onClick = {
+//                              println("BACK BUTTON CLICKED ===")
+//                              component.onBack()
+//                          }
+//                      ){
+//                          Text("Go Back",color = Color.White)
+//                      }
+//                  }
+
+             PostDetailScreen(component)
 
               }
          }
