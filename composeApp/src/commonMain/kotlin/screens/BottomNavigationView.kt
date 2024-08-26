@@ -22,7 +22,7 @@ import com.ramaas.iguhallee.MR
 import decompose.home.HomeScreenComponent
 import decompose.home.TabComponent
 import dev.icerock.moko.resources.compose.painterResource
-import helpers.NoRippleTheme
+import util.NoRippleTheme
 import kotlinx.coroutines.launch
 import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetContent
 import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetScaffold
@@ -54,7 +54,7 @@ import screens.PostDetailScreen.PostDetailScreen
              }
          ),
      ) {
-         when(it.instance) {
+         when(val instance = it.instance) {
               is HomeScreenComponent.FullScreenChild.None -> {
                   CupertinoBottomSheetScaffold(
                       modifier = Modifier.fillMaxSize(),
@@ -140,23 +140,11 @@ import screens.PostDetailScreen.PostDetailScreen
                       }
                   }
               }
-              is HomeScreenComponent.FullScreenChild.PostScreen ->
-//                  CupertinoScaffold(containerColor = Color.Blue,modifier = Modifier.fillMaxSize()){
-//                      CupertinoButton(
-//                          modifier = Modifier.offset(y = 50.dp).background(Color.Blue),
-//                          onClick = {
-//                              println("BACK BUTTON CLICKED ===")
-//                              component.onBack()
-//                          }
-//                      ){
-//                          Text("Go Back",color = Color.White)
-//                      }
-//                  }
-
-             PostDetailScreen(component)
-
+              is HomeScreenComponent.FullScreenChild.PostScreen ->  {
+                  PostDetailScreen(instance.component)
               }
          }
+       }
 
      }
 

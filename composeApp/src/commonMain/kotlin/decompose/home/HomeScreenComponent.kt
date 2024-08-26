@@ -2,32 +2,26 @@ package decompose.home
 
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.active
-import com.arkivanov.decompose.router.stack.backStack
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.backhandler.BackDispatcher
 import com.arkivanov.essenty.parcelable.Parcelable
 import domain.model.HomeScreenState
 import kotlinx.serialization.Serializable
-import navigation.PostDetailComponent
-import kotlin.random.Random
+import decompose.detail.PostDetailComponent
 
 
 class HomeScreenComponent(
     private val tabFactory: TabComponent.Factory,
+    private val postDetailFactory: PostDetailComponent.Factory,
     private val componentContext: ComponentContext,
     private val onNavigateTo: (String) -> Unit
 ):ComponentContext by componentContext {
-
 
     init {
         println("HI THE H COMPONENT HAS BEEN CREATED")
@@ -85,8 +79,8 @@ class HomeScreenComponent(
     }
 
     private fun postDetailComponent(config: MainConfig.PostScreen,componentContext: ComponentContext): PostDetailComponent {
-        return PostDetailComponent(
-            config.postID,
+        return postDetailFactory.create(
+            postID = config.postID.toLong(),
             componentContext = componentContext,
             onGoBack = { println("Go Back to HomeScreen Component ===") }
         )
@@ -95,16 +89,17 @@ class HomeScreenComponent(
         return tabFactory.create(
             componentContext = componentContext,
             tab = config.tab,
-            onNavigatePost = {
+            onNavigatePost = { postID ->
                 println("AT GRAND PARENT NOW, EXECUTE EVENT")
-                mainNavigation.push(MainConfig.PostScreen(""))
+                mainNavigation.push(MainConfig.PostScreen(postID))
             }
         )
     }
 
 
     class Factory(
-        private val tabFactory: TabComponent.Factory
+        private val tabFactory: TabComponent.Factory,
+        private val postDetailFactory: PostDetailComponent.Factory
     ){
         fun create(
             componentContext: ComponentContext,
@@ -112,7 +107,8 @@ class HomeScreenComponent(
         ) = HomeScreenComponent(
             componentContext = componentContext,
             onNavigateTo = onNavigateTo,
-            tabFactory = tabFactory
+            tabFactory = tabFactory,
+            postDetailFactory = postDetailFactory
         )
     }
 
@@ -120,7 +116,7 @@ class HomeScreenComponent(
 
     sealed interface FullScreenChild {
         object None: FullScreenChild
-        class PostScreen(val postDetailsComponent: PostDetailComponent): FullScreenChild
+        class PostScreen(val component: PostDetailComponent): FullScreenChild
     }
     @Serializable
     sealed interface MainConfig: Parcelable {

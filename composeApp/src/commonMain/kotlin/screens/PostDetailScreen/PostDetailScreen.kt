@@ -1,14 +1,20 @@
 package screens.PostDetailScreen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,22 +23,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,30 +53,26 @@ import androidx.compose.material.IconToggleButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallTopAppBar
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -75,35 +83,61 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.ImageLoader
-import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.crossfade
+import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
+import com.github.panpf.sketch.request.ComposableImageRequest
+import com.github.panpf.zoomimage.SketchZoomAsyncImage
+import com.github.panpf.zoomimage.compose.zoom.ScrollBarSpec
 import com.ramaas.iguhallee.MR
 import core.Constants.DEFAULT_MINIMUM_TEXT_LINE
-import decompose.home.HomeScreenComponent
+import data.post.PostDetailState
 import dev.icerock.moko.resources.compose.painterResource
-import io.github.alexzhirkevich.cupertino.CupertinoScaffold
-import io.github.alexzhirkevich.cupertino.CupertinoTopAppBar
+import io.github.alexzhirkevich.cupertino.CupertinoActivityIndicator
 import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
-import kotlin.math.roundToInt
+import decompose.detail.PostDetailComponent
+import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetContent
+import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetScaffold
+import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetScaffoldState
+import io.github.alexzhirkevich.cupertino.CupertinoButton
+import io.github.alexzhirkevich.cupertino.CupertinoButtonDefaults
+import io.github.alexzhirkevich.cupertino.CupertinoSheetState
+import io.github.alexzhirkevich.cupertino.PresentationStyle
+import io.github.alexzhirkevich.cupertino.rememberCupertinoSheetState
+import kotlinx.coroutines.launch
+import util.MakePhoneCall
 
 
-@OptIn(ExperimentalCupertinoApi::class, ExperimentalMaterial3Api::class)
+private val barHeight = 56.dp
+private val navigationIconStartPadding = 4.dp
+
+
+@OptIn(ExperimentalCupertinoApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun PostDetailScreen(rootComponent: HomeScreenComponent){
-    // CollapsingToolbar Implementation
-    val toolbarHeight = 300.dp
+fun PostDetailScreen(component: PostDetailComponent) {
+
+    println("Post Detial Component == ${component.postID}")
+    val state by component.state.subscribeAsState()
+    val scope = rememberCoroutineScope()
+
+    var bottomSheetState = rememberCupertinoSheetState(presentationStyle = PresentationStyle.Fullscreen)
+    val verticalScroll = rememberScrollState()
+
+    val toolbarHeight = 1046.dp
     val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
-    val toolbarOffsetHeightPx = remember { mutableStateOf(  0f) }
+    val toolbarOffsetHeightPx = remember { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -115,112 +149,209 @@ fun PostDetailScreen(rootComponent: HomeScreenComponent){
             }
         }
     }
-    CupertinoScaffold(
+
+
+    CupertinoBottomSheetScaffold(
+        modifier = Modifier
+            .fillMaxSize(),
         topBar = {
             CollapsingToolbarBase(
+                toolbarHeading = "",
                 toolbarHeight = toolbarHeight,
                 toolbarOffset = toolbarOffsetHeightPx.value,
-                toolbarHeading = "Something",
-                collapsedBackgroundColor = Color.Black,
-                backgroundColor = Color.Transparent,
-            ){}
-//            CupertinoTopAppBar(
-//                isTranslucent = false,
-//                isTransparent = true,
-//                title = {},
-//                navigationIcon = {
-//                    Icon(
-//                        modifier = Modifier
-//                            .clickable(
-//                                interactionSource = MutableInteractionSource(),
-//                                indication = null,
-//                                onClick = { rootComponent.onBack() }
-//                        ),
-//                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-//                        contentDescription = null,
-//                        tint = Color.White
-//                    )
-//                },
-//            )
+                collapsedBackgroundColor = Color(72, 134, 255),
+                backgroundColor = Color.Transparent
+            ){
+                Box(modifier = Modifier.fillMaxSize()){
+                    Icon(
+                        painter = painterResource(MR.images.back_icon),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.padding(start = 5.dp).rotate(180F).align(Alignment.CenterStart)
+                    )
+                }
+            }
+        },
+        scaffoldState = CupertinoBottomSheetScaffoldState(bottomSheetState),
+        sheetSwipeEnabled = false,
+        sheetDragHandle = null,
+        sheetContent = {
+
+            val currentPagerPosition = remember { mutableIntStateOf(1) }
+            val listOfImages = state.post?.postImgs
+            val pagerState = rememberPagerState(0,0F, pageCount = {listOfImages?.size ?: 1})
+
+            CupertinoBottomSheetContent(
+                containerColor = Color.Black
+            ) {
+                Column(modifier = Modifier.fillMaxSize()){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .statusBarsPadding(),
+                    ){
+                        CupertinoButton(
+                            colors = CupertinoButtonDefaults.borderedButtonColors(containerColor = Color.Transparent),
+                            modifier = Modifier.align(Alignment.TopStart),
+                            onClick = {
+                                scope.launch {
+                                    bottomSheetState.hide()
+                                }
+                            }
+                        ) {
+                            Text(
+                                text = "Done",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "${currentPagerPosition.value} / ${listOfImages?.size}",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                        )
+                    }
+
+
+                    HorizontalPager(
+                        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.85F),
+                        pageSpacing = 10.dp,
+                        state = pagerState,
+                        pageSize = PageSize.Fill,
+                        key = { listOfImages?.get(it) ?: ""}
+                    ){ index ->
+                        val media = listOfImages?.get(index)
+                        currentPagerPosition.value = pagerState.currentPage + 1
+                        val model = ComposableImageRequest(media){
+                            crossfade()
+                        }
+                        
+                        SketchZoomAsyncImage(
+                            request = model,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            scrollBar = ScrollBarSpec(Color.Transparent)
+                        )
+
+
+                        SubcomposeAsyncImage(
+                            model = model,
+                            contentDescription = null,
+                            loading = {
+                                ShowLoadingIndicator(DpSize(55.dp,55.dp), PaddingValues(top = 20.dp))
+                            },
+                            imageLoader = ImageLoader(LocalPlatformContext.current),
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
+                    }
+                }
+
+
+
+
+            }
         }
     ){
+
         Column(
-            modifier = Modifier.fillMaxHeight().nestedScroll(nestedScrollConnection),
+            modifier = Modifier
+                .fillMaxHeight()
+                .background(Color(241, 242, 243)),
             verticalArrangement = Arrangement.SpaceBetween
         ){
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .nestedScroll(nestedScrollConnection)
+                    .verticalScroll(verticalScroll)
                     .background(Color(241, 242, 243))
                     .weight(1f, false)
             ){
-                PagerSection()
-                FirstSection()
-                SecondSection()
-                DescriptionSection()
-                ShareListingSection()
-                MainInfoSection()
-                DateInfoSection()
-            }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(Color.White)
-                    .border(1.dp,Color(216,214,217,))
-                    .padding(start = 10.dp, top = 10.dp, end = 10.dp, bottom = 20.dp)
-            ){
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(55.dp),
-                    shape = RoundedCornerShape(5.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(231,84,98)
-                    )
+                PagerSection(bottomSheetState,state,verticalScroll)
+                FirstSection(component,state)
+                SecondSection(state)
 
-                ) {
-                    Text(
-                        text = "Call",
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 17.sp
-                    )
-                }
-            }
+           }
+            CallButtonSection(state = state)
         }
-
     }
+
+
 }
+
+
+
+
+
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagerSection() {
+fun PagerSection(
+    imageFullScreenState: CupertinoSheetState,
+    state: PostDetailState,
+    verticalScroll: ScrollState
+) {
 
-    val listOfImages = listOf(
-        "https://imagedelivery.net/ePR8PyKf84wPHx7_RYmEag/d8be5b82-5498-4043-694d-043fb930f900/86",
-        "https://imagedelivery.net/ePR8PyKf84wPHx7_RYmEag/93a490ab-8194-46c3-882e-be93e7462b00/86"
-    )
-    val pagerState = rememberPagerState(0,0F, pageCount = { 2 })
+    val scope = rememberCoroutineScope()
+
+    val listOfImages = state.post?.postImgs
+
+    val pagerState = rememberPagerState(0,0F, pageCount = { listOfImages?.size ?: 1 })
     var currentPagerPosition = remember { mutableIntStateOf(1) }
 
-    Box(modifier = Modifier.fillMaxWidth().height(380.dp)){
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(380.dp)
+            .graphicsLayer {
+                alpha =  -1f / 720.dp.toPx() * verticalScroll.value  + 1
+            }
+    ){
         HorizontalPager(
             state = pagerState,
             pageSize =  PageSize.Fill,
-            key = { listOfImages[it]}
+            key = { listOfImages?.get(it) ?: "" }
         ){ index ->
-            val media = listOfImages[index]
+            val media = listOfImages?.get(index)
             currentPagerPosition.value = pagerState.currentPage + 1
-            AsyncImage(
-                model = media,
+            val imageRequest = coil3.request.ImageRequest
+                .Builder(LocalPlatformContext.current)
+                .data(media)
+                .crossfade(true)
+                .build()
+            SubcomposeAsyncImage(
+                model = imageRequest,
                 contentDescription = null,
+                onLoading = {},
+                onError = {println("IMAGE ERROR MESSAGE == ${it.result.throwable.message}")},
+                onSuccess = { println("IMAGE LOADED MESSAGE == ${it.result.image} ") },
+                loading = {
+                    if(media != listOfImages!![0]) {
+                        println("IS NOT FIRST IMAGE === ")
+                        ShowLoadingIndicator(
+                            size = DpSize(35.dp,35.dp),
+                            padding = PaddingValues(top = 0.dp)
+                        )
+                    }
+
+                },
                 imageLoader = ImageLoader(context = LocalPlatformContext.current),
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillBounds
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        scope.launch {
+                            imageFullScreenState.show()
+                        }
+                    },
+                contentScale = ContentScale.FillBounds,
             )
         }
 
@@ -232,7 +363,7 @@ fun PagerSection() {
                 .background(Color.Black.copy(alpha = 0.45f))
         ){
             Text(
-                text = "${currentPagerPosition.value}/${listOfImages.size}",
+                text = "${currentPagerPosition.value}/${listOfImages?.size}",
                 color = Color.White,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -243,99 +374,154 @@ fun PagerSection() {
     }
 }
 
+@OptIn(ExperimentalCupertinoApi::class)
 @Composable
-fun FirstSection(){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(190.dp)
-            .background(Color.White)
-            .padding(start = 15.dp,top = 15.dp, bottom =  10.dp, end = 15.dp)
-    ){
-        Column(modifier = Modifier.fillMaxWidth()){
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
-            ){
-                Text(
-                    text = "3 bedroom flat in Fulham Palace Road, London, W6",
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 2,
-                )
-                Box(
-                    modifier = Modifier
-                        .size(43.dp)
-                        .clip(CircleShape)
-                        .border(0.5.dp, color = Color.Gray, CircleShape)
-                ){
-                    IconToggleButton(
-                        checked = false,
-                        onCheckedChange = {},
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .clickable(
-                                interactionSource = MutableInteractionSource(),
-                                indication = null,
-                                onClick = {}
-                            ),
-                    ){
-                        Icon(
-                            modifier = Modifier.size(20.dp),
-                            painter = painterResource(MR.images.love_icon),
-                            contentDescription = null,
-                            tint = Color(131, 139, 151),
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(27.dp))
-
-            Row(modifier = Modifier.fillMaxWidth()){
-                Text(text = "£", fontSize = 20.5.sp)
-                Text(
-                    text = "90.00",
-                    fontSize = 34.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(23.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Icon(
-                    painter = painterResource(MR.images.location_icon),
-                    contentDescription = null,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(15.dp)
-                )
-
-                Spacer(modifier = Modifier.width(5.dp))
-
-                Text(
-                    text = "Acton",
-                    color = Color(0,127,176),
-                    fontSize = 15.5.sp,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-
-
-
-        }
+fun ShowLoadingIndicator(size:DpSize,padding: PaddingValues){
+    Box(modifier = Modifier.fillMaxWidth()){
+        CupertinoActivityIndicator(
+            modifier = Modifier
+                .size(size)
+                .padding(padding)
+                .align(Alignment.Center)
+        )
     }
-
-    Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Composable
-fun SecondSection(){
+fun FirstSection(component: PostDetailComponent, state: PostDetailState) {
+
+    if (state.isMainContentLoading) ShowLoadingIndicator(DpSize(40.dp,40.dp), PaddingValues(top = 20.dp))
+
+    val postID = state.post?.id
+
+    AnimatedVisibility(
+        visible = !state.isMainContentLoading,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ){
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(190.dp)
+                .background(Color.White)
+                .padding(start = 15.dp, top = 15.dp, bottom = 10.dp, end = 15.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Text(
+                        text = "${state.post?.title}",
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 2,
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(43.dp)
+                            .clip(CircleShape)
+                            .clickable(enabled = false, interactionSource = MutableInteractionSource(), indication = null){}
+                            .border(0.5.dp, color = Color.Gray, CircleShape)
+                    ) {
+                        IconToggleButton(
+                            checked = false,
+                            onCheckedChange = {},
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .clickable(
+                                    interactionSource = MutableInteractionSource(),
+                                    indication = null,
+                                    onClick = {}
+                                ),
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable(
+                                        enabled = true,
+                                        interactionSource = MutableInteractionSource(),
+                                        indication = rememberRipple(),
+                                        onClick = {
+                                            if(state.isPostBookmarked) component.unBookmarkPost(postID!!)
+                                            else component.bookmarkPost(postID!!)
+                                        }
+                                    ),
+                                painter = painterResource(
+                                    if(state.isPostBookmarked) MR.images.love_icon_active
+                                    else MR.images.love_icon
+                                ),
+                                contentDescription = null,
+                                tint = if (state.isPostBookmarked) Color(255, 117, 109) else Color(131, 139, 151),
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(27.dp))
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "£", fontSize = 20.5.sp)
+                    Text(
+                        text = "${state.post?.formattedPrice}",
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(23.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(MR.images.location_icon),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(15.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    Text(
+                        text = "${state.post?.district}, ${state.post?.location}",
+                        color = Color(0, 127, 176),
+                        fontSize = 15.5.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+            }
+      }
+    }
+
+}
+
+@Composable
+fun SecondSection(state: PostDetailState){
+    if(!state.isUserProfileLoading && !state.isMainContentLoading){
+        AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()){
+            Column(modifier = Modifier.fillMaxWidth()){
+                UserInfoSection(state)
+                DescriptionSection(state)
+                ShareListingSection()
+                MainInfoSection(state)
+                DateInfoSection(state)
+            }
+        }
+
+    } else if(!state.isMainContentLoading){
+        ShowLoadingIndicator(DpSize(40.dp,40.dp), PaddingValues(top = 20.dp))
+    }
+}
+
+@Composable
+fun UserInfoSection(state: PostDetailState) {
+    val user = state.user
+
+    Spacer(modifier = Modifier.height(8.dp))
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -348,12 +534,12 @@ fun SecondSection(){
         Spacer(modifier = Modifier.width(75.dp))
         Column(modifier = Modifier){
             Text(
-                text = "Alex (1 listing)",
+                text = "${user?.profileName} (${user?.postCount} listing)",
                 fontSize = 18.sp
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "Member since 2014",
+                text = "Member since ${user?.memberSince}",
                 color = Color(192,192,192),
                 fontSize = 15.sp
             )
@@ -371,7 +557,9 @@ fun SecondSection(){
 }
 
 @Composable
-fun DescriptionSection(){
+fun DescriptionSection(state: PostDetailState){
+
+    val post = state.post
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -381,26 +569,7 @@ fun DescriptionSection(){
         .padding(start = 15.dp,top = 15.dp, bottom =  10.dp, end = 15.dp)
     ){
         ExpandableText(
-            text = "\uD83C\uDFE0 Double Room near Uxbridge Town Centre & Brunel University \uD83C\uDFE0\n" +
-                    "\n" +
-                    "Discover this delightful double room located conveniently close to Uxbridge Town Centre, Brunel University, Heathrow, and the M4/M40 motorways.\n" +
-                    "\n" +
-                    "First-floor flat, ideal for a single occupant (£700) or two occupants (£800)—perfect for professionals or students.\n" +
-                    "Monthly Rent: £800\n" +
-                    "\n" +
-                    "Postcode: UB8 2DQ\n" +
-                    "\n" +
-                    "Location Highlights:\n" +
-                    "5-7 minutes' walk to Brunel University.\n" +
-                    "10–12 minutes' walk to Uxbridge Centre and Tube Station.\n" +
-                    "Easy access to West Drayton Station.\n" +
-                    "\n" +
-                    "\uD83D\uDD0D Additional Information:\n" +
-                    "For immediate viewings, please get in touch via:\n" +
-                    "\n" +
-                    "WhatsApp using the reference: UB8 2DQ\n" +
-                    "Don't miss out on this fantastic opportunity! \n" +
-                    "Contact us now to arrange a viewing."
+            text = "${post?.descriptions}"
 
         )
     }
@@ -457,7 +626,9 @@ fun ShareListingSection(){
 }
 
 @Composable
-fun MainInfoSection(){
+fun MainInfoSection(state:PostDetailState){
+
+    val user = state.user
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -474,7 +645,7 @@ fun MainInfoSection(){
             fontSize = 18.sp
         )
         Text(
-            text = "Agency",
+            text = "${user?.usertype?.name}",
             color = Color(33,33,33),
             fontSize = 18.sp
         )
@@ -482,7 +653,9 @@ fun MainInfoSection(){
 }
 
 @Composable
-fun DateInfoSection(){
+fun DateInfoSection(state: PostDetailState){
+
+    val post = state.post
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -519,7 +692,7 @@ fun DateInfoSection(){
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Text(
-                text = "ID: 1479943257",
+                text = "ID: ${post?.id?.times(-1)}",
                 color = Color(192,192,192),
                 fontSize = 14.5.sp
             )
@@ -534,6 +707,40 @@ fun DateInfoSection(){
     }
 
     Spacer(modifier = Modifier.height(8.dp))
+}
+
+@Composable
+fun CallButtonSection(state: PostDetailState) {
+
+    if (!state.isMainContentLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .background(Color.White)
+                .border(1.dp,Color(216,214,217,))
+                .padding(start = 10.dp, top = 10.dp, end = 10.dp, bottom = 20.dp)
+        ){
+            Button(
+                onClick = { MakePhoneCall("") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp),
+                shape = RoundedCornerShape(5.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(231,84,98)
+                )
+
+            ) {
+                Text(
+                    text = "Call",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 17.sp
+                )
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -630,7 +837,6 @@ fun ExpandableText(
 }
 
 
-
 @Composable
 fun CollapsingToolbarBase(
     modifier: Modifier = Modifier,
@@ -644,7 +850,7 @@ fun CollapsingToolbarBase(
     collapsedBackgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     toolbarHeight: Dp,
-    minShrinkHeight: Dp = 80.dp,
+    minShrinkHeight: Dp = 100.dp,
     toolbarOffset: Float,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -655,15 +861,7 @@ fun CollapsingToolbarBase(
 
     val scrollDp = toolbarHeight + toolbarOffset.dp
 
-    println("SCROLL DP == ${scrollDp}")
-//    val animatedCardSize by animateDpAsState(
-//        targetValue = if (scrollDp <= minShrinkHeight) minShrinkHeight else scrollDp,
-//        animationSpec = tween(300, easing = LinearOutSlowInEasing)
-//    )
-    val animatedElevation by animateDpAsState(
-        targetValue = if (scrollDp < minShrinkHeight + 20.dp) 10.dp else 0.dp,
-        animationSpec = tween(500, easing = LinearOutSlowInEasing)
-    )
+
     val animatedTitleAlpha by animateFloatAsState(
         targetValue = if (toolbarHeading.isNotBlank()) {
             if (scrollDp <= minShrinkHeight + 20.dp) 1f else 0f
@@ -683,19 +881,13 @@ fun CollapsingToolbarBase(
         )
     }
 
-    val animatedModifier = modifier
-        .graphicsLayer(
-            scaleX = animatedProgress.value
-        )
+
 
     Box(
-        modifier = animatedModifier
+        modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .shadow(
-                elevation = animatedElevation,
-                shape = shape
-            )
+            .height(90.dp)
+
             .background(
                 color = animatedColor,
                 shape = shape

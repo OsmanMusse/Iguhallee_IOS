@@ -1,20 +1,15 @@
 package screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -46,7 +41,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.ramaas.iguhallee.MR
 import components.FlexibleTopBar
 import components.FlexibleTopBarDefaults
-import components.ScrollableContent
+import screens.HomeScreen.ScrollableContent
 import components.pullRefresh.PullToRefreshLayout
 import components.pullRefresh.PullToRefreshLayoutState
 import components.pullRefresh.RefreshIndicatorState

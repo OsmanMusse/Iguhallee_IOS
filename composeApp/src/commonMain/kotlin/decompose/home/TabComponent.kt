@@ -13,7 +13,7 @@ class TabComponent(
     componentContext: ComponentContext,
     val tab: Tab,
     private val homeListFactory: HomeListComponent.Factory,
-    private val onNavigatePost: () -> Unit
+    private val onNavigatePost: (postID:String) -> Unit
 ): ComponentContext by componentContext {
 
     init {
@@ -59,9 +59,9 @@ class TabComponent(
     private fun homeChild(componentContext: ComponentContext): HomeListComponent {
         return homeListFactory.create(
             componentContext,
-            onPushScreen = {
-                println("BUBBLE EVENT TO GRAND PARENT")
-                onNavigatePost()
+            onPushScreen = { postID ->
+                println("BUBBLE EVENT TO GRAND PARENT == ${postID}")
+                onNavigatePost(postID)
         })
     }
 
@@ -114,7 +114,7 @@ class TabComponent(
         fun create(
             componentContext: ComponentContext,
             tab: Tab,
-            onNavigatePost: () -> Unit
+            onNavigatePost: (postID:String) -> Unit
         ): TabComponent = TabComponent(
             componentContext = componentContext,
             tab = tab,

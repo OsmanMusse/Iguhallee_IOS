@@ -60,8 +60,8 @@ kotlin {
             implementation("io.github.alexzhirkevich:cupertino:0.1.0-alpha03")
             implementation("io.github.alexzhirkevich:cupertino-decompose:0.1.0-alpha03")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-            implementation("dev.gitlive:firebase-firestore:1.11.1")
-            implementation("dev.gitlive:firebase-common:1.11.1")
+            implementation("dev.gitlive:firebase-firestore:1.12.0")
+            implementation("dev.gitlive:firebase-common:1.12.0")
             implementation("dev.icerock.moko:mvvm-core:0.16.1")
             implementation("dev.icerock.moko:mvvm-compose:0.16.1")
 
@@ -89,6 +89,14 @@ kotlin {
 
             // KOTLIN MULTIPLATFORM NETWORK CONNECTION
             implementation("dev.tmapps:konnection:1.3.0")
+
+            // Constraint Layout
+            implementation("tech.annexflow.compose:constraintlayout-compose-multiplatform:0.4.0")
+
+            implementation("io.github.panpf.zoomimage:zoomimage-compose-sketch:1.1.0-beta01")
+
+//            implementation("com.mxalbert.zoomable:zoomable:1.6.1")
+
         }
 
         val iosX64Main by getting {
@@ -156,6 +164,9 @@ android {
         implementation("io.insert-koin:koin-core")
         implementation("io.insert-koin:koin-android")
     }
+}
+dependencies {
+    implementation(libs.androidx.constraintlayout)
 }
 
 sqldelight {

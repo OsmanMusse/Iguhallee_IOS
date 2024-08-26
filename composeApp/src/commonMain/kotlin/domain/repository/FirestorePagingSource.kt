@@ -6,7 +6,6 @@ import app.cash.paging.PagingSource
 import dev.gitlive.firebase.firestore.Query
 import dev.gitlive.firebase.firestore.QuerySnapshot
 import dev.gitlive.firebase.firestore.startAfter
-import dev.tmapps.konnection.Konnection
 import domain.model.Post
 
 class FirestorePagingSource(
@@ -16,10 +15,13 @@ class FirestorePagingSource(
     override fun getRefreshKey(state: PagingState<QuerySnapshot, Post>): QuerySnapshot? = null
 
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, Post> {
-        val connection = Konnection.instance
-        if (!connection.isConnected()) return LoadResult.Error(Exception(IndexOutOfBoundsException("INTERNET IS NOT CONNECTED")))
+//        val connection = Konnection.instance
+//        if (!connection.isConnected()) return LoadResult.Error(Exception(IndexOutOfBoundsException("INTERNET IS NOT CONNECTED")))
         return try {
             val currentPage = params.key ?: queryPostByCity.get()
+
+
+
             println("CURRENT PAGE SIZE == ${currentPage.documents.size}")
             val lastVisibleProduct = currentPage.documents[currentPage.documents.size - 1]
             val nextPage = queryPostByCity.startAfter(lastVisibleProduct).get()

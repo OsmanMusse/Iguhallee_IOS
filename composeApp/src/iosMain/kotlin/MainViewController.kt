@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.lifecycle.ApplicationLifecycle
 import org.koin.compose.getKoin
+import platform.UIKit.UIApplication
 
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController {
-
 
 
     println("Running root 1")
