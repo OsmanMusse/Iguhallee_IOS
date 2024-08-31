@@ -6,11 +6,9 @@ import app.cash.paging.PagingData
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.ramaas.iguhallee.Database
-import core.Constants
+import util.Constants
 import data.post.toList
-import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.firestore.Direction
-import dev.gitlive.firebase.firestore.DocumentChange
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
@@ -19,8 +17,6 @@ import domain.model.PostStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 

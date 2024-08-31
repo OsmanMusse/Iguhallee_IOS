@@ -1,6 +1,11 @@
 package decompose.detail
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.router.slot.ChildSlot
+import com.arkivanov.decompose.router.slot.SlotNavigation
+import com.arkivanov.decompose.router.slot.activate
+import com.arkivanov.decompose.router.slot.childSlot
+import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
@@ -10,16 +15,32 @@ import domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 
 class  PostDetailComponent (
     private val postRepo: PostRepository,
     private val userRepo: UserRepository,
     val postID: Long,
-    private val onGoBack: () -> Unit,
+    private val onBackPressed: () -> Unit,
     componentContext: ComponentContext
 ): ComponentContext by componentContext {
+
+
+    private val modalNavigation = SlotNavigation<DialogConfig>()
+
+    var modal = childSlot(
+        source = modalNavigation,
+        serializer = DialogConfig.serializer(),
+        handleBackButton = true
+    ){ config, childComponentContext ->
+        DefaultPagerModal(
+            componentContext = childComponentContext,
+            onDismissClicked = { dismissModal() }
+        )
+    }
 
     private val scope = coroutineScope(CoroutineScope(Dispatchers.Main).coroutineContext + SupervisorJob())
 
@@ -27,12 +48,21 @@ class  PostDetailComponent (
     val state: Value<PostDetailState> = _state
 
     init {
-        println("POST ID RECIEVED THROUGH THE ARGUEMNT == ${postID}")
         getPost(postID)
-
     }
 
+    fun showPagerModal(){
+        println("MODAL ACTIVATE CALLED ===")
+        modalNavigation.activate(DialogConfig(""))
+    }
 
+    private fun dismissModal(){
+        // delay required for modal to not interrupt animation sliding down
+        scope.launch {
+            delay(500)
+            modalNavigation.dismiss()
+        }
+    }
 
 
      fun bookmarkPost(postID: Long){
@@ -78,10 +108,13 @@ class  PostDetailComponent (
         }
     }
 
-     fun goBack(){
-         onGoBack()
-     }
+     fun navigateBack() = onBackPressed()
 
+
+    @Serializable
+    data class DialogConfig(
+        val message: String,
+    )
 
     class Factory(
         private val postRepo: PostRepository,
@@ -94,7 +127,7 @@ class  PostDetailComponent (
         ): PostDetailComponent = PostDetailComponent(
             componentContext = componentContext,
             postID =  postID,
-            onGoBack = onGoBack,
+            onBackPressed = onGoBack,
             postRepo = postRepo,
             userRepo = userRepo
         )

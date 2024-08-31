@@ -2,6 +2,7 @@ package decompose.home
 
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -50,7 +51,7 @@ class HomeScreenComponent(
             source = tabNavigation,
             initialConfiguration = TabConfig(TabComponent.Tab.Home),
             key = "tabs",
-            handleBackButton = false,
+            handleBackButton = true,
             childFactory = ::createTab,
         )
 
@@ -60,6 +61,7 @@ class HomeScreenComponent(
 
 
     fun onBack(){
+        println("DO BACK GESTURE 2 ===")
         mainNavigation.pop()
     }
 
@@ -82,7 +84,7 @@ class HomeScreenComponent(
         return postDetailFactory.create(
             postID = config.postID.toLong(),
             componentContext = componentContext,
-            onGoBack = { println("Go Back to HomeScreen Component ===") }
+            onGoBack = { mainNavigation.pop() }
         )
     }
     private fun createTab(config: TabConfig, componentContext: ComponentContext): TabComponent {

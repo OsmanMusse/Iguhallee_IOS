@@ -1,6 +1,6 @@
 package domain.repository
 
-import core.Constants
+import util.Constants
 import dev.gitlive.firebase.firestore.FirebaseFirestore
 import domain.model.User
 

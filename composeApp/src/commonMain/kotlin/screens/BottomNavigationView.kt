@@ -50,6 +50,7 @@ import screens.PostDetailScreen.PostDetailScreen
          animation = cupertinoPredictiveBackAnimation(
              backHandler = component.backHandler,
              onBack = {
+                 println("DO BACK GESTURE ===")
                  component.onBack()
              }
          ),
@@ -61,7 +62,6 @@ import screens.PostDetailScreen.PostDetailScreen
                       scaffoldState = CupertinoBottomSheetScaffoldState(bottomSheetState),
                       bottomBar = {
                           val grayTitleColor = Color(158, 158, 158)
-                          val grayIconColor = Color(190, 190, 190)
                           val primaryColor = Color(72, 134, 255)
 
                           val tabStack by component.tabStack.subscribeAsState()

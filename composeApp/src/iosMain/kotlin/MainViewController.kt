@@ -18,10 +18,7 @@ import platform.UIKit.UIApplication
 fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController {
 
 
-    println("Running root 1")
    val getKoinA = getKoin()
-
-    println("Running root 2")
 
     PredictiveBackGestureOverlay(
         backDispatcher = backDispatcher,
@@ -38,9 +35,5 @@ fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController
 
         App(root)
     }
-
-
-
-
 
 }

@@ -1,7 +1,7 @@
 package di
 
 import app.cash.paging.PagingConfig
-import core.Constants
+import util.Constants
 import decompose.home.HomeListComponent
 import decompose.home.HomeScreenComponent
 import decompose.home.TabComponent
