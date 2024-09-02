@@ -8,6 +8,7 @@ import com.arkivanov.decompose.router.slot.childSlot
 import com.arkivanov.decompose.router.slot.dismiss
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import data.post.PostDetailState
 import domain.repository.PostRepository
@@ -29,7 +30,12 @@ class  PostDetailComponent (
 ): ComponentContext by componentContext {
 
 
+    private val backCallback = BackCallback{
+        println("BACK BTN PRESS CALLBACK ===")
+    }
     private val modalNavigation = SlotNavigation<DialogConfig>()
+
+
 
     var modal = childSlot(
         source = modalNavigation,
@@ -48,12 +54,19 @@ class  PostDetailComponent (
     val state: Value<PostDetailState> = _state
 
     init {
+        setupBackHandler()
         getPost(postID)
     }
 
+
+    private fun setupBackHandler(){
+        backCallback.isEnabled = false
+        backHandler.register(backCallback)
+    }
     fun showPagerModal(){
         println("MODAL ACTIVATE CALLED ===")
         modalNavigation.activate(DialogConfig(""))
+        backCallback.isEnabled = true
     }
 
     private fun dismissModal(){
@@ -61,6 +74,7 @@ class  PostDetailComponent (
         scope.launch {
             delay(500)
             modalNavigation.dismiss()
+            backCallback.isEnabled = false
         }
     }
 

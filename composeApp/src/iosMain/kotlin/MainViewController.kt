@@ -17,7 +17,6 @@ import platform.UIKit.UIApplication
 @OptIn(ExperimentalDecomposeApi::class)
 fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController {
 
-
    val getKoinA = getKoin()
 
     PredictiveBackGestureOverlay(

@@ -35,9 +35,10 @@ import io.github.alexzhirkevich.cupertino.CupertinoBottomSheetContent
 import io.github.alexzhirkevich.cupertino.CupertinoButton
 import io.github.alexzhirkevich.cupertino.CupertinoButtonDefaults
 import io.github.alexzhirkevich.cupertino.CupertinoSheetState
+import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalCupertinoApi::class)
 @Composable
 fun PagerModal(
     onDismissClicked: () -> Unit,

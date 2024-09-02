@@ -118,14 +118,13 @@ fun PostDetailScreen(component: PostDetailComponent) {
                 backgroundColor = Color.Transparent,
                 toolbarHeight = toolbarHeight,
                 toolbarOffset = toolbarOffsetHeightPx.value,
-                onBackButtonPressed = { component.navigateBack() }
+                onBackButtonPressed = {  component.navigateBack() }
             )
         },
         scaffoldState = CupertinoBottomSheetScaffoldState(bottomSheetState),
-        sheetSwipeEnabled = true,
+        sheetSwipeEnabled = false,
         sheetDragHandle = null,
         sheetContent = {
-            modalState.child?.instance?.also {
                 PagerModal(
                     onDismissClicked = {
                         println("MODAL DISMISS MASCUUD ===")
@@ -136,16 +135,15 @@ fun PostDetailScreen(component: PostDetailComponent) {
                     },
                     listOfImages = postList
                 )
-            }
         }
-    ){
+    ) {
 
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .background(Color(241, 242, 243)),
             verticalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -153,17 +151,16 @@ fun PostDetailScreen(component: PostDetailComponent) {
                     .verticalScroll(verticalScroll)
                     .background(Color(241, 242, 243))
                     .weight(1f, false)
-            ){
+            ) {
 
-                PagerSection(component,state,verticalScroll)
-                FirstSection(component,state)
+                PagerSection(component, state, verticalScroll)
+                FirstSection(component, state)
                 SecondSection(state)
 
-           }
+            }
             CallButtonSection(state = state)
         }
     }
-
 
 }
 
