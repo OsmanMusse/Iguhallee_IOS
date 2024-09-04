@@ -1,10 +1,8 @@
 package decompose.home
 
 
-import androidx.paging.filter
 import app.cash.paging.PagingData
 import app.cash.paging.cachedIn
-import app.cash.paging.map
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
@@ -15,13 +13,13 @@ import domain.repository.PostRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class HomeListComponent(
     private val repo: PostRepository,
     componentContext: ComponentContext,
-    private val onPushScreen: (String) -> Unit
+    private val onPushScreen: (String) -> Unit,
+    private val onPushLocationScreen: (String) -> Unit
 ): ComponentContext by componentContext {
 
     private val _state = MutableValue(HomeScreenState())
@@ -32,38 +30,21 @@ class HomeListComponent(
 
     // Paging
 
-    private val _localDataList = MutableStateFlow(listOf<Post>())
-
     private val _posts: MutableStateFlow<PagingData<Post>> = MutableStateFlow(PagingData.empty())
     val posts: StateFlow<PagingData<Post>> = _posts.asStateFlow()
 
-
-
-//
-//    val combinedDataList = _posts.cachedIn(componentScope).combine(_localDataList){ paging, local ->
-//        paging.map {
-//            if (it.id == local.get(it.id.toInt()).id) local
-//            else it
-//        }
-//    }
 
     init {
        println("HOMELIST COMPONENT CREATED")
         retrieveLikedPost()
         retrievePosts()
-        retrieveTestPosts()
         observeLikedPosts()
-//        _posts.value.map {
-//            if()
-//        }
     }
 
-    private fun retrieveTestPosts(){
-        componentScope.launch {
-            println("FINAL DATA == ${repo.testGetAllPosts()}")
-        }
-    }
 
+    fun updateLocation(location: String) {
+        _state.value = _state.value.copy(currentCity = location)
+    }
     private fun observeLikedPosts(){
         componentScope.launch {
             repo.getAllLikedPosts().collect { newList ->
@@ -89,6 +70,10 @@ class HomeListComponent(
         onPushScreen("${postID}")
     }
 
+    fun goToLocationScreen(location: String) {
+        onPushLocationScreen(location)
+    }
+
 
     private fun retrieveLikedPost(){
         componentScope.launch {
@@ -111,11 +96,13 @@ class HomeListComponent(
  ){
     fun create(
         componentContext: ComponentContext,
-        onPushScreen: (String) -> Unit
+        onPushScreen: (String) -> Unit,
+        onPushLocationScreen: (String) -> Unit
     ): HomeListComponent = HomeListComponent(
         componentContext = componentContext,
         repo = repo,
-        onPushScreen = onPushScreen
+        onPushScreen = onPushScreen,
+        onPushLocationScreen = onPushLocationScreen
     )
   }
  }

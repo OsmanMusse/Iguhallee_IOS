@@ -43,7 +43,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cash.paging.LoadStateError
-import app.cash.paging.LoadStateNotLoading
 import app.cash.paging.compose.LazyPagingItems
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
@@ -85,10 +84,10 @@ fun ScrollableContent(
             state.isInitialLoad = false
         }
 
-        else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
-            errorMsg.value = "MEZUT MUSSE"
-            state.isInitialLoad = false
-        }
+//        else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
+//            errorMsg.value = "MEZUT MUSSE"
+//            state.isInitialLoad = false
+//        }
     }
 
 
@@ -104,7 +103,7 @@ fun ScrollableContent(
         contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 60.dp)
     ) {
         item(span = { GridItemSpan(2) }) {
-            ScrollableContentHeader()
+            ScrollableContentHeader(component)
         }
         items(pagingPosts.itemCount) { index ->
             val specificPost = pagingPosts[index]
@@ -112,9 +111,9 @@ fun ScrollableContent(
                 component = component,
                 postData =  specificPost!!,index,
                 onclick = {
-                println("POST CLICKEED == ${index}")
-                component.goToDetailsScreen(specificPost?.id)
-            })
+                    component.goToDetailsScreen(specificPost?.id)
+                }
+            )
 
         }
     }
@@ -231,7 +230,8 @@ fun ScrollableMainContent(component: HomeListComponent, postData: Post, index: I
 }
 
 @Composable
-fun ScrollableContentHeader(){
+fun ScrollableContentHeader(component: HomeListComponent) {
+    val state by component.state.subscribeAsState()
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(23.dp),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -242,7 +242,12 @@ fun ScrollableContentHeader(){
             fontSize = 15.sp
         )
         Text(
-            text = "98 Bollo Bridge Road",
+            modifier = Modifier
+                .clickable(
+                    interactionSource = MutableInteractionSource(),
+                    indication = null
+                ){ component.goToLocationScreen("${state.currentCity}")  },
+            text = "${state.currentCity}",
             color = Color(72, 134, 255),
             fontSize = 16.sp
         )

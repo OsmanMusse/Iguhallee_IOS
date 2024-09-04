@@ -67,7 +67,7 @@ fun HomeListView(component: HomeListComponent) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val refreshLayoutState = remember { PullToRefreshLayoutState({"RADSADSA"}) }
 
-    println("IS REFRESH LOADING == ${pagingPosts.loadState.refresh is LoadStateLoading} &&  ${pagingPosts.loadState.refresh is LoadStateNotLoading}")
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -80,7 +80,7 @@ fun HomeListView(component: HomeListComponent) {
               FlexibleTopBar(
                 modifier = Modifier.fillMaxWidth(),
                 colors = FlexibleTopBarDefaults.topAppBarColors(
-                containerColor = Color(72, 134, 255)
+                containerColor = mainColor
                 ),
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
              ) {
@@ -112,7 +112,6 @@ fun HomeListView(component: HomeListComponent) {
                 ),
                 scrollBehavior = scrollBehavior
             ){
-                // 16.dp - 4.dp
                 Row(
                     modifier = Modifier.fillMaxWidth().height(80.dp).background(Color.White)
                         .padding(top = 0.dp, bottom = 0.dp, end = 16.dp - 4.dp),

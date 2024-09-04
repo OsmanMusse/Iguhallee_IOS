@@ -3,6 +3,7 @@ package decompose.home
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -13,11 +14,17 @@ class TabComponent(
     componentContext: ComponentContext,
     val tab: Tab,
     private val homeListFactory: HomeListComponent.Factory,
-    private val onNavigatePost: (postID:String) -> Unit
+    private val onNavigatePost: (postID:String) -> Unit,
+    private val onNavigateLocation: (location: String) -> Unit
 ): ComponentContext by componentContext {
 
     init {
         println("HELLO TAB COMPONENT CREATED === ${tab} ")
+    }
+
+
+    fun onLocationChecked(location: String) {
+        (_stack.active.instance as Child.Main.Home).component.updateLocation(location)
     }
 
     private val navigation = StackNavigation<Config>()
@@ -59,10 +66,9 @@ class TabComponent(
     private fun homeChild(componentContext: ComponentContext): HomeListComponent {
         return homeListFactory.create(
             componentContext,
-            onPushScreen = { postID ->
-                println("BUBBLE EVENT TO GRAND PARENT == ${postID}")
-                onNavigatePost(postID)
-        })
+            onPushScreen = { onNavigatePost(it) },
+            onPushLocationScreen = { onNavigateLocation(it) }
+        )
     }
 
     private fun savedChild(componentContext: ComponentContext): AccountComponent {
@@ -81,9 +87,6 @@ class TabComponent(
             class Settings(val component: AccountComponent): Main
         }
 
-//        class Session(val component: SessionDetailComponent): Child
-//        class Sponsor(val component: SponsorDetailComponent): Child
-//        class Speaker(val component: SpeakerDetailComponent): Child
     }
 
     enum class Tab {
@@ -96,15 +99,6 @@ class TabComponent(
     private sealed interface Config: Parcelable {
         @Serializable
         data class Main(val tab: Tab): Config
-
-        @Serializable
-        data class Session(val sessionId: String): Config
-
-        @Serializable
-        data class Sponsor(val sponsor: String): Config
-
-        @Serializable
-        data class Speaker(val profile: String): Config
     }
 
     class Factory(
@@ -114,12 +108,14 @@ class TabComponent(
         fun create(
             componentContext: ComponentContext,
             tab: Tab,
-            onNavigatePost: (postID:String) -> Unit
+            onNavigatePost: (postID:String) -> Unit,
+            onNavigateLocation: (location: String) -> Unit
         ): TabComponent = TabComponent(
             componentContext = componentContext,
             tab = tab,
             homeListFactory = homeListFactory,
-            onNavigatePost = onNavigatePost
+            onNavigatePost = onNavigatePost,
+            onNavigateLocation = onNavigateLocation
         )
 
     }

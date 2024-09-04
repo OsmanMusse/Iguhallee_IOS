@@ -2,9 +2,9 @@ package decompose.home
 
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
@@ -15,6 +15,8 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import domain.model.HomeScreenState
 import kotlinx.serialization.Serializable
 import decompose.detail.PostDetailComponent
+import decompose.location.DefaultSelectLocationComponent
+import decompose.location.SelectLocationComponent
 
 
 class HomeScreenComponent(
@@ -77,6 +79,7 @@ class HomeScreenComponent(
         return when(config){
             is MainConfig.None -> FullScreenChild.None
             is MainConfig.PostScreen -> FullScreenChild.PostScreen(postDetailComponent(config,componentContext))
+            is MainConfig.LocationScreen -> FullScreenChild.SelectLocationScreen(selectLocationComponent(componentContext))
         }
     }
 
@@ -87,13 +90,26 @@ class HomeScreenComponent(
             onGoBack = { mainNavigation.pop() }
         )
     }
+
+    private fun selectLocationComponent(componentContext: ComponentContext): SelectLocationComponent {
+        return DefaultSelectLocationComponent(
+            componentContext = componentContext,
+            onGoBack = { location ->
+                mainNavigation.pop {
+                    if (location != null) (tabStack.active.instance).onLocationChecked(location)
+                }
+            }
+        )
+    }
     private fun createTab(config: TabConfig, componentContext: ComponentContext): TabComponent {
         return tabFactory.create(
             componentContext = componentContext,
             tab = config.tab,
             onNavigatePost = { postID ->
-                println("AT GRAND PARENT NOW, EXECUTE EVENT")
                 mainNavigation.push(MainConfig.PostScreen(postID))
+            },
+            onNavigateLocation = { location ->
+                mainNavigation.push(MainConfig.LocationScreen(location))
             }
         )
     }
@@ -119,6 +135,7 @@ class HomeScreenComponent(
     sealed interface FullScreenChild {
         object None: FullScreenChild
         class PostScreen(val component: PostDetailComponent): FullScreenChild
+        class SelectLocationScreen(val component: SelectLocationComponent): FullScreenChild
     }
     @Serializable
     sealed interface MainConfig: Parcelable {
@@ -126,6 +143,9 @@ class HomeScreenComponent(
         data object None: MainConfig
         @Serializable
         data class PostScreen(val postID: String): MainConfig
+
+        @Serializable
+        data class LocationScreen(val location: String): MainConfig
     }
 
     @Serializable

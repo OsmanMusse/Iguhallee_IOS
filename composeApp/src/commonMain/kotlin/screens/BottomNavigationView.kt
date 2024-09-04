@@ -34,6 +34,7 @@ import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import io.github.alexzhirkevich.cupertino.decompose.cupertinoPredictiveBackAnimation
 import kotlinx.coroutines.CoroutineScope
 import screens.PostDetailScreen.PostDetailScreen
+import screens.SelectLocationScreen.SelectLocationScreen
 
 
 @OptIn(ExperimentalCupertinoApi::class, ExperimentalDecomposeApi::class)
@@ -43,6 +44,7 @@ import screens.PostDetailScreen.PostDetailScreen
     scope: CoroutineScope,
     bottomSheetState: CupertinoSheetState,
  ) {
+
 
      Children(
          stack = component.fullScreenStack,
@@ -143,6 +145,7 @@ import screens.PostDetailScreen.PostDetailScreen
               is HomeScreenComponent.FullScreenChild.PostScreen ->  {
                   PostDetailScreen(instance.component)
               }
+              is HomeScreenComponent.FullScreenChild.SelectLocationScreen -> SelectLocationScreen(instance.component)
          }
        }
 
