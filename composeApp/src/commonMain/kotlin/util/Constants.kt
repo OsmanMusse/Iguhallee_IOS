@@ -12,3 +12,4 @@ object Constants {
     const val POST_COLLECTION = "Posts"
     const val USER_COLLECTION = "Users"
 }
+

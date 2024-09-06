@@ -5,9 +5,9 @@ import domain.model.Post
 import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
-    suspend fun getAllPosts(): Flow<PagingData<Post>>
+    suspend fun getAllPosts(location: String): Flow<PagingData<Post>>
 
-    suspend fun testGetAllPosts(): Unit
+    suspend fun testGetAllPosts()
     suspend fun getAllLikedPosts(): Flow<List<Long>>
 
     suspend fun getPost(postID: Long): Flow<Post>

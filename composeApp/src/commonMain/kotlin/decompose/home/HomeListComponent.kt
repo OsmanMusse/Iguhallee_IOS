@@ -45,6 +45,13 @@ class HomeListComponent(
     fun updateLocation(location: String) {
         _state.value = _state.value.copy(currentCity = location)
     }
+
+    fun refreshPosts() =  retrievePosts()
+
+    fun emptyPagingData() {
+        _posts.value = PagingData.empty()
+    }
+
     private fun observeLikedPosts(){
         componentScope.launch {
             repo.getAllLikedPosts().collect { newList ->
@@ -83,8 +90,10 @@ class HomeListComponent(
         }
     }
     private fun retrievePosts(){
+        val location = _state.value.currentCity
+        println("CALL RETRIEVE POST === ${location}")
        componentScope.launch {
-           repo.getAllPosts().cachedIn(componentScope).collect { pagingData ->
+           repo.getAllPosts(location).cachedIn(componentScope).collect { pagingData ->
               _posts.value = pagingData
            }
        }

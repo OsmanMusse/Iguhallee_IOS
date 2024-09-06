@@ -43,6 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.cash.paging.LoadStateError
+import app.cash.paging.LoadStateLoading
+import app.cash.paging.LoadStateNotLoading
 import app.cash.paging.compose.LazyPagingItems
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
@@ -52,6 +54,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.ramaas.iguhallee.MR
 import decompose.home.HomeListComponent
 import dev.icerock.moko.resources.compose.painterResource
+import domain.model.HomeScreenState
 import domain.model.Post
 import util.NoRippleTheme
 import io.github.alexzhirkevich.cupertino.CupertinoAlertDialog
@@ -72,6 +75,17 @@ fun ScrollableContent(
     val shouldShowAlertDialog = remember { mutableStateOf(false) }
     val state by component.state.subscribeAsState()
 
+    val refreshState = pagingPosts.loadState.refresh is LoadStateLoading
+
+
+    LaunchedEffect(state.currentCity){
+        println("REFRESH STATE WHEN STATE CHANGE === ${refreshState}")
+        if (!state.isInitialLoad) {
+            println("REFRESH DATA BECAUSE OF LOCATION CHANGE === ")
+            component.refreshPosts()
+        }
+    }
+
 
     LaunchedEffect(pagingPosts.loadState){
         if(pagingPosts.loadState.append is LoadStateError){
@@ -80,14 +94,21 @@ fun ScrollableContent(
         }
         else if(pagingPosts.loadState.refresh is LoadStateError){
             errorMsg.value = "${(pagingPosts.loadState.refresh as LoadStateError).error.message}"
-            shouldShowAlertDialog.value = true
+            when(errorMsg.value){
+                PagingError.INTERNET_CONNECTION.errorMsg -> {
+                    shouldShowAlertDialog.value = true
+                }
+                PagingError.QUERY_NOT_FOUND_FROM_DATABASE.errorMsg -> {
+                    component.emptyPagingData()
+                }
+            }
             state.isInitialLoad = false
         }
 
-//        else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
+        else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
 //            errorMsg.value = "MEZUT MUSSE"
-//            state.isInitialLoad = false
-//        }
+            state.isInitialLoad = false
+        }
     }
 
 
@@ -97,19 +118,21 @@ fun ScrollableContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(241, 242, 243))
-            .pullRefresh(rememberPullRefreshState(refreshing = true, onRefresh = {})),
+            .pullRefresh(rememberPullRefreshState(refreshing = true, onRefresh = {  })),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 60.dp)
     ) {
         item(span = { GridItemSpan(2) }) {
-            ScrollableContentHeader(component)
+            ScrollableContentHeader(state,component)
         }
         items(pagingPosts.itemCount) { index ->
             val specificPost = pagingPosts[index]
             ScrollableMainContent(
+                state = state,
                 component = component,
-                postData =  specificPost!!,index,
+                postData =  specificPost!!,
+                index = index,
                 onclick = {
                     component.goToDetailsScreen(specificPost?.id)
                 }
@@ -148,9 +171,15 @@ fun ScrollableContent(
 
 
 @Composable
-fun ScrollableMainContent(component: HomeListComponent, postData: Post, index: Int,onclick:(index:Int) -> Unit){
+fun ScrollableMainContent(
+    component: HomeListComponent,
+    postData: Post,
+    index: Int,
+    onclick: (index: Int) -> Unit,
+    state: HomeScreenState
+){
 
-    val state by component.state.subscribeAsState()
+//    val state by component.state.subscribeAsState()
     println("STATE CHANGED ===")
     var isLoveToggled by rememberSaveable { mutableStateOf(state.bookmarkedPosts.contains(postData.id)) }
 
@@ -230,13 +259,14 @@ fun ScrollableMainContent(component: HomeListComponent, postData: Post, index: I
 }
 
 @Composable
-fun ScrollableContentHeader(component: HomeListComponent) {
-    val state by component.state.subscribeAsState()
+fun ScrollableContentHeader(state: HomeScreenState, component: HomeListComponent) {
+//    val state by component.state.subscribeAsState()
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(23.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ){
         Text(
+
             text = "In your area",
             color = Color(120, 120, 120),
             fontSize = 15.sp

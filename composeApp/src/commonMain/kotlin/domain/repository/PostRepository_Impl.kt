@@ -44,11 +44,14 @@ class PostRepositoryImpl(
     }
 
 
-    override suspend fun getAllPosts(): Flow<PagingData<Post>> {
+    override suspend fun getAllPosts(location: String): Flow<PagingData<Post>> {
+
+        println("REPO IMPL LOCATION === ${location}")
 
         val query = remoteDB.collection("Posts")
             .orderBy("datePosted",Direction.DESCENDING)
             .where { "status" equalTo PostStatus.APPROVED.text }
+            .where { "location" equalTo location }
             .limit(Constants.PAGE_SIZE)
 
         return Pager(
