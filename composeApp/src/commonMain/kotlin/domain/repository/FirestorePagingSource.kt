@@ -20,8 +20,10 @@ class FirestorePagingSource(
 
         val currentPage = params.key ?: queryPostByCity.get()
         val connection = Konnection.instance
-        if (!connection.isConnected()) return LoadResult.Error(Exception(IndexOutOfBoundsException(PagingError.INTERNET_CONNECTION.errorMsg)))
+        println("CURRENT PAGE DATA == 1")
+        if (!connection.isConnected()) return LoadResult.Error(IndexOutOfBoundsException(PagingError.INTERNET_CONNECTION.errorMsg))
         else if(currentPage.documents.isEmpty()) return LoadResult.Error(IndexOutOfBoundsException(PagingError.QUERY_NOT_FOUND_FROM_DATABASE.errorMsg))
+        println("CURRENT PAGE DATA == 2")
         return try {
 
             println("CURRENT PAGE SIZE == ${currentPage.documents.size} QUERY == ${queryPostByCity}")

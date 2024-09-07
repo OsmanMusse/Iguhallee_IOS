@@ -89,10 +89,12 @@ fun ScrollableContent(
 
     LaunchedEffect(pagingPosts.loadState){
         if(pagingPosts.loadState.append is LoadStateError){
+            println("ERROR == 1")
             errorMsg.value = "${(pagingPosts.loadState.append as LoadStateError).error.message}"
             shouldShowAlertDialog.value = true
         }
         else if(pagingPosts.loadState.refresh is LoadStateError){
+            println("ERROR == 2")
             errorMsg.value = "${(pagingPosts.loadState.refresh as LoadStateError).error.message}"
             when(errorMsg.value){
                 PagingError.INTERNET_CONNECTION.errorMsg -> {
@@ -106,7 +108,7 @@ fun ScrollableContent(
         }
 
         else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
-//            errorMsg.value = "MEZUT MUSSE"
+            println("ERROR == 3")
             state.isInitialLoad = false
         }
     }

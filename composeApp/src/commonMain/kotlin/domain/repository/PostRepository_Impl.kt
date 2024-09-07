@@ -54,6 +54,8 @@ class PostRepositoryImpl(
             .where { "location" equalTo location }
             .limit(Constants.PAGE_SIZE)
 
+        println("REPO")
+
         return Pager(
             config = config
         ) {
