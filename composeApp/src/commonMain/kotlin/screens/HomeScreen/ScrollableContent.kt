@@ -1,16 +1,21 @@
 package screens.HomeScreen
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -56,6 +61,7 @@ import decompose.home.HomeListComponent
 import dev.icerock.moko.resources.compose.painterResource
 import domain.model.HomeScreenState
 import domain.model.Post
+import io.github.alexzhirkevich.cupertino.CupertinoActivityIndicator
 import util.NoRippleTheme
 import io.github.alexzhirkevich.cupertino.CupertinoAlertDialog
 import io.github.alexzhirkevich.cupertino.CupertinoText
@@ -63,7 +69,7 @@ import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import io.github.alexzhirkevich.cupertino.default
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalCupertinoApi::class)
+@OptIn(ExperimentalCupertinoApi::class)
 @Composable
 fun ScrollableContent(
     component: HomeListComponent,
@@ -94,8 +100,8 @@ fun ScrollableContent(
             shouldShowAlertDialog.value = true
         }
         else if(pagingPosts.loadState.refresh is LoadStateError){
-            println("ERROR == 2")
             errorMsg.value = "${(pagingPosts.loadState.refresh as LoadStateError).error.message}"
+            println("ERROR == 2 msg = ${errorMsg.value}")
             when(errorMsg.value){
                 PagingError.INTERNET_CONNECTION.errorMsg -> {
                     shouldShowAlertDialog.value = true
@@ -108,10 +114,11 @@ fun ScrollableContent(
         }
 
         else if (pagingPosts.loadState.refresh is LoadStateNotLoading){
-            println("ERROR == 3")
+            println("ERROR == 3 STATE == ${state.isInitialLoad}")
             state.isInitialLoad = false
         }
     }
+
 
 
 
@@ -119,15 +126,17 @@ fun ScrollableContent(
         columns = GridCells.Fixed(2),
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(241, 242, 243))
-            .pullRefresh(rememberPullRefreshState(refreshing = true, onRefresh = {  })),
+            .background(Color(241, 242, 243)),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 60.dp)
     ) {
+
         item(span = { GridItemSpan(2) }) {
+            println("RELOAD THE FOLLOWING SECTION === ")
             ScrollableContentHeader(state,component)
         }
+
         items(pagingPosts.itemCount) { index ->
             val specificPost = pagingPosts[index]
             ScrollableMainContent(
@@ -181,7 +190,6 @@ fun ScrollableMainContent(
     state: HomeScreenState
 ){
 
-//    val state by component.state.subscribeAsState()
     println("STATE CHANGED ===")
     var isLoveToggled by rememberSaveable { mutableStateOf(state.bookmarkedPosts.contains(postData.id)) }
 
@@ -262,7 +270,6 @@ fun ScrollableMainContent(
 
 @Composable
 fun ScrollableContentHeader(state: HomeScreenState, component: HomeListComponent) {
-//    val state by component.state.subscribeAsState()
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(23.dp),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -284,6 +291,7 @@ fun ScrollableContentHeader(state: HomeScreenState, component: HomeListComponent
             fontSize = 16.sp
         )
     }
+
 }
 
 

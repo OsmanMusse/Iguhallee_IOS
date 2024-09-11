@@ -11,6 +11,9 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		D330F1332C906DD00005F02E /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D330F1322C906DD00005F02E /* SplashScreen.storyboard */; };
+		D37817562C90D92C003CBA75 /* Gabarito-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D37817532C90D791003CBA75 /* Gabarito-SemiBold.ttf */; };
+		D37817582C90F98A003CBA75 /* iguhallee_title.png in Resources */ = {isa = PBXBuildFile; fileRef = D37817572C90F98A003CBA75 /* iguhallee_title.png */; };
 		D38842F72BB8EA6D00B4447B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D38842F62BB8EA6D00B4447B /* FirebaseAuth */; };
 		D38842F92BB8EA6D00B4447B /* FirebaseAuthCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = D38842F82BB8EA6D00B4447B /* FirebaseAuthCombine-Community */; };
 		D38842FB2BB8EA6D00B4447B /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = D38842FA2BB8EA6D00B4447B /* FirebaseDatabase */; };
@@ -41,6 +44,9 @@
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		D330F1322C906DD00005F02E /* SplashScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SplashScreen.storyboard; sourceTree = "<group>"; };
+		D37817532C90D791003CBA75 /* Gabarito-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Gabarito-SemiBold.ttf"; sourceTree = "<group>"; };
+		D37817572C90F98A003CBA75 /* iguhallee_title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = iguhallee_title.png; path = ../../../iguhallee_title.png; sourceTree = "<group>"; };
 		D388431A2BC301B200B4447B /* Koin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Koin.swift; sourceTree = "<group>"; };
 		D3F23BEB2BDE79D600B95621 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,6 +116,8 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				D37817572C90F98A003CBA75 /* iguhallee_title.png */,
+				D37817532C90D791003CBA75 /* Gabarito-SemiBold.ttf */,
 				D3F23BEB2BDE79D600B95621 /* GoogleService-Info.plist */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
@@ -117,6 +125,7 @@
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				D388431A2BC301B200B4447B /* Koin.swift */,
+				D330F1322C906DD00005F02E /* SplashScreen.storyboard */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -212,7 +221,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D37817562C90D92C003CBA75 /* Gabarito-SemiBold.ttf in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
+				D330F1332C906DD00005F02E /* SplashScreen.storyboard in Resources */,
+				D37817582C90F98A003CBA75 /* iguhallee_title.png in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,7 +247,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.PLATFORM_NAME=\"$PLATFORM_NAME\" \\\n    -Pmoko.resources.CONFIGURATION=\"$CONFIGURATION\" \\\n    -Pmoko.resources.ARCHS=\"$ARCHS\" \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \n";
+			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.PLATFORM_NAME=\"$PLATFORM_NAME\" \\\n    -Pmoko.resources.CONFIGURATION=\"$CONFIGURATION\" \\\n    -Pmoko.resources.ARCHS=\"$ARCHS\" \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \n\n\n";
 		};
 		F36B1CEB2AD83DDC00CB74D5 /* Compile Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;

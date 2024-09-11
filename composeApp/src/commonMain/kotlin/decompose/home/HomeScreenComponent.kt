@@ -79,7 +79,7 @@ class HomeScreenComponent(
         return when(config){
             is MainConfig.None -> FullScreenChild.None
             is MainConfig.PostScreen -> FullScreenChild.PostScreen(postDetailComponent(config,componentContext))
-            is MainConfig.LocationScreen -> FullScreenChild.SelectLocationScreen(selectLocationComponent(componentContext))
+            is MainConfig.LocationScreen -> FullScreenChild.SelectLocationScreen(selectLocationComponent(config,componentContext))
         }
     }
 
@@ -91,9 +91,10 @@ class HomeScreenComponent(
         )
     }
 
-    private fun selectLocationComponent(componentContext: ComponentContext): SelectLocationComponent {
+    private fun selectLocationComponent(config: MainConfig.LocationScreen,componentContext: ComponentContext): SelectLocationComponent {
         return DefaultSelectLocationComponent(
             componentContext = componentContext,
+            currentLocation = config.location,
             onGoBack = { location ->
                 mainNavigation.pop {
                     if (location != null) (tabStack.active.instance).onLocationChecked(location)

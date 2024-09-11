@@ -93,9 +93,13 @@ kotlin {
             // Constraint Layout
             implementation("tech.annexflow.compose:constraintlayout-compose-multiplatform:0.4.0")
 
+            // Zoom Image Library
             implementation("io.github.panpf.zoomimage:zoomimage-compose-sketch:1.1.0-beta01")
 
-//            implementation("com.mxalbert.zoomable:zoomable:1.6.1")
+            // Key-Value Storage Library
+            api(libs.datastore.preferences)
+            api(libs.datastore)
+
 
         }
 

@@ -4,6 +4,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.replaceCurrent
+import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import decompose.home.HomeScreenComponent
@@ -26,6 +28,10 @@ class DefaultRootComponent(
 
     override val backDispatcher: BackDispatcher =
         (backHandler as? BackDispatcher) ?: BackDispatcher()
+
+
+
+
 
 
     // Internal logic of decompose that Manages the navigation and the navigation stack
