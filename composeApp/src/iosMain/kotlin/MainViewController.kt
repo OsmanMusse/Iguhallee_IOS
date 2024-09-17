@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.lifecycle.ApplicationLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import org.koin.compose.getKoin
 import platform.UIKit.UIApplication
 
@@ -28,7 +30,10 @@ fun MainViewController(backDispatcher: BackDispatcher) = ComposeUIViewController
         val root = remember {
             DefaultRootComponent(
                 componentContext = DefaultComponentContext(lifecycle = ApplicationLifecycle(), backHandler = backDispatcher),
-                homeScreenFactory = getKoinA.get()
+                appPreferencesRepo = getKoinA.get(),
+                homeScreenFactory = getKoinA.get(),
+                splashScreenFactory = getKoinA.get(),
+                landingScreenFactory = getKoinA.get()
             )
         }
 

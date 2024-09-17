@@ -1,35 +1,45 @@
-package decompose.landing
+package decompose.splash
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.stack.ChildStack
-import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.update
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import decompose.splash.DefaultSplashComponent
-import decompose.splash.SplashComponent
+import decompose.detail.PostDetailComponent
+import decompose.home.HomeScreenComponent
+import decompose.home.TabComponent
 import domain.repository.preferences.AppPreferencesRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import kotlin.coroutines.CoroutineContext
 
-class DefaultLandingComponent(
+class DefaultSplashComponent(
     componentContext: ComponentContext,
     private val mainContext: CoroutineContext,
     private val ioContext: CoroutineContext,
     private val appPreferencesRepo: AppPreferencesRepository,
-): LandingComponent, ComponentContext by componentContext {
+    private val onNavigateTo: (locationSelected: String?) -> Unit
+): SplashComponent, ComponentContext by componentContext {
+
 
     init {
-        println("RUNNING LANDING COMPONENT === ")
+        retrieveInitialAppPref()
+
     }
 
-    override suspend fun setUserLocation(location: String){
+
+//    private val _rootState = MutableValue(SplashModel())
+//    override val rootState: Value<SplashModel> = _rootState
+
+    private fun retrieveInitialAppPref(){
         coroutineScope(mainContext).launch {
+            println("DATASTORE 1 == ")
+            var isDefaultLocationSelected: String?
             withContext(ioContext){
-                appPreferencesRepo.setDefaultLocation(location)
+                 isDefaultLocationSelected = appPreferencesRepo.fetchInitialPreferences().defaultLocation
             }
+            onNavigateTo(isDefaultLocationSelected)
+
         }
     }
 
@@ -41,12 +51,13 @@ class DefaultLandingComponent(
     ){
         fun create(
             componentContext: ComponentContext,
-        ) = DefaultLandingComponent(
+            onNavigateTo:(locationSelected:String?) -> Unit
+        ) = DefaultSplashComponent(
             componentContext = componentContext,
             mainContext = mainContext,
             ioContext = ioContext,
             appPreferencesRepo = appPreferencesRepository,
+            onNavigateTo = onNavigateTo
         )
     }
-
 }

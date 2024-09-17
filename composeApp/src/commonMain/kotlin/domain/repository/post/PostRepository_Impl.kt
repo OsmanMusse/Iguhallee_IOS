@@ -1,4 +1,4 @@
-package domain.repository
+package domain.repository.post
 
 import app.cash.paging.Pager
 import app.cash.paging.PagingConfig
@@ -14,6 +14,7 @@ import dev.gitlive.firebase.firestore.orderBy
 import dev.gitlive.firebase.firestore.where
 import domain.model.Post
 import domain.model.PostStatus
+import domain.repository.FirestorePagingSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow

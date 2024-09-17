@@ -7,14 +7,26 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.update
 import com.arkivanov.essenty.backhandler.BackDispatcher
+import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
 import decompose.home.HomeScreenComponent
 import decompose.landing.DefaultLandingComponent
+import decompose.landing.LandingComponent
+import decompose.splash.DefaultSplashComponent
+import domain.repository.preferences.AppPreferencesRepository
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlin.coroutines.CoroutineContext
 
 class DefaultRootComponent(
-    componentContext: ComponentContext,
+    private val componentContext: ComponentContext,
+    private val appPreferencesRepo: AppPreferencesRepository,
     private val homeScreenFactory: HomeScreenComponent.Factory,
+    private val landingScreenFactory: DefaultLandingComponent.Factory,
+    private val splashScreenFactory: DefaultSplashComponent.Factory
 ): RootComponent, ComponentContext by componentContext {
 
 
@@ -25,13 +37,15 @@ class DefaultRootComponent(
 
     private val rootNavigation = StackNavigation<RootConfig>()
 
+    /**
+     * Use this to retrieve first patch of initial preferences by blocking the thread.
+     */
+    private val isLocationAssigned = runBlocking { appPreferencesRepo.fetchInitialPreferences().isDefaultLocationSelected }
+
+
 
     override val backDispatcher: BackDispatcher =
         (backHandler as? BackDispatcher) ?: BackDispatcher()
-
-
-
-
 
 
     // Internal logic of decompose that Manages the navigation and the navigation stack
@@ -39,22 +53,51 @@ class DefaultRootComponent(
         childStack(
             source = rootNavigation,
             serializer = RootConfig.serializer(),
-            initialConfiguration = RootConfig.Main,
+            initialConfiguration = if(isLocationAssigned) RootConfig.Main else RootConfig.Landing,
             handleBackButton = true,
             childFactory = ::createChild,
         )
+
+
+
+    override fun navigateToHomeScreen(selectedLocation: String?) {
+        if (selectedLocation != null) {
+            rootNavigation.replaceCurrent(RootConfig.Main)
+        } else {
+            rootNavigation.replaceCurrent(RootConfig.Landing)
+        }
+    }
 
     private fun createChild(
         config: RootConfig,
         context: ComponentContext
     ): RootComponent.RootChild{
         return when(config){
-            is RootConfig.Landing -> RootComponent.RootChild.LandingRoot(
-                DefaultLandingComponent(context)
+            is RootConfig.Landing -> {
+                println("CREATING CHILD 1 === ")
+                RootComponent.RootChild.LandingRoot(
+                    landingScreenFactory.create(
+                        componentContext = componentContext
+                    )
+                )
+            }
+
+            is RootConfig.Splash -> RootComponent.RootChild.SplashRoot(
+                splashScreenFactory.create(
+                    componentContext = componentContext,
+                    onNavigateTo = { location ->
+                        println("WAS LOCATION SELECTED PRIOR == $location")
+                        navigateToHomeScreen(location)
+                    }
+                )
             )
-            is RootConfig.Main -> RootComponent.RootChild.MainRoot(
-                homeScreenFactory.create(componentContext = context, onNavigateTo = {})
-            )
+
+            is RootConfig.Main -> {
+                println("CREATING CHILD 2 === ")
+                RootComponent.RootChild.MainRoot(
+                    homeScreenFactory.create(componentContext = context, onNavigateTo = {})
+                )
+            }
         }
     }
 
@@ -64,6 +107,8 @@ class DefaultRootComponent(
     private sealed interface RootConfig {
         @Serializable
         data object Landing : RootConfig
+
+        data object Splash: RootConfig
 
         @Serializable
         data object Main : RootConfig

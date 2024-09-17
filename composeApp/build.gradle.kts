@@ -76,7 +76,7 @@ kotlin {
             //// DECOMPOSE NAVIGATION LIBRARY ////
             implementation(libs.decompose.decompose)
             implementation(libs.decompose.extensionsComposeJetbrains)
-            implementation("com.arkivanov.essenty:lifecycle-coroutines:2.0.0-alpha01")
+            implementation("com.arkivanov.essenty:lifecycle-coroutines:2.1.0")
             implementation(libs.kotlinx.serialization.json)
 
             //// CASHAPP MULTIPLATFORM PAGING ////

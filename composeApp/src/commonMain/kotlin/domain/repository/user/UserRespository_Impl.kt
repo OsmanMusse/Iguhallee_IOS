@@ -1,4 +1,4 @@
-package domain.repository
+package domain.repository.user
 
 import util.Constants
 import dev.gitlive.firebase.firestore.FirebaseFirestore

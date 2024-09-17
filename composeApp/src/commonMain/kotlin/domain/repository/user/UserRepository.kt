@@ -1,4 +1,4 @@
-package domain.repository
+package domain.repository.user
 
 import domain.model.User
 

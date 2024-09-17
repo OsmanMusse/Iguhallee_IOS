@@ -8,11 +8,15 @@ import decompose.home.TabComponent
 import decompose.root.DefaultRootComponent
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
-import domain.repository.PostRepository
-import domain.repository.PostRepositoryImpl
-import domain.repository.UserRepository
-import domain.repository.UserRespository_Impl
+import domain.repository.post.PostRepository
+import domain.repository.post.PostRepositoryImpl
+import domain.repository.user.UserRepository
+import domain.repository.user.UserRespository_Impl
 import decompose.detail.PostDetailComponent
+import decompose.landing.DefaultLandingComponent
+import decompose.splash.DefaultSplashComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import org.koin.dsl.module
 import util.DatabaseDriverFactory
 import util.createDatabase
@@ -42,22 +46,38 @@ val commonModule = module {
     }
 
     single<UserRepository> {
-        UserRespository_Impl(
-            remoteDB = get()
-        )
+        UserRespository_Impl(remoteDB = get())
     }
 
     single {
         DefaultRootComponent(
             componentContext = get(),
-            homeScreenFactory = get()
+            appPreferencesRepo = get(),
+            homeScreenFactory = get(),
+            splashScreenFactory = get(),
+            landingScreenFactory = get(),
         )
     }
 
     single {
-        TabComponent.Factory(
-            homeListFactory = get()
+        DefaultSplashComponent.Factory(
+            mainContext = Dispatchers.Main,
+            ioContext = Dispatchers.IO,
+            appPreferencesRepository = get()
         )
+    }
+
+    single {
+        DefaultLandingComponent.Factory(
+            mainContext = Dispatchers.Main,
+            ioContext = Dispatchers.IO,
+            appPreferencesRepository = get()
+        )
+    }
+
+
+    single {
+        TabComponent.Factory(homeListFactory = get())
     }
 
 
@@ -70,9 +90,7 @@ val commonModule = module {
 
 
     single {
-        HomeListComponent.Factory(
-            repo = get()
-        )
+        HomeListComponent.Factory(repo = get())
     }
 
     single {

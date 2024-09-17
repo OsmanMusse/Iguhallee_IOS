@@ -1,4 +1,4 @@
-package domain.repository
+package domain.repository.post
 
 import app.cash.paging.PagingData
 import domain.model.Post
