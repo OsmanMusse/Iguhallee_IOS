@@ -43,7 +43,6 @@ class DefaultRootComponent(
     private val isLocationAssigned = runBlocking { appPreferencesRepo.fetchInitialPreferences().isDefaultLocationSelected }
 
 
-
     override val backDispatcher: BackDispatcher =
         (backHandler as? BackDispatcher) ?: BackDispatcher()
 
@@ -73,8 +72,8 @@ class DefaultRootComponent(
         context: ComponentContext
     ): RootComponent.RootChild{
         return when(config){
+
             is RootConfig.Landing -> {
-                println("CREATING CHILD 1 === ")
                 RootComponent.RootChild.LandingRoot(
                     landingScreenFactory.create(
                         componentContext = componentContext
@@ -82,18 +81,18 @@ class DefaultRootComponent(
                 )
             }
 
-            is RootConfig.Splash -> RootComponent.RootChild.SplashRoot(
-                splashScreenFactory.create(
-                    componentContext = componentContext,
-                    onNavigateTo = { location ->
-                        println("WAS LOCATION SELECTED PRIOR == $location")
-                        navigateToHomeScreen(location)
-                    }
+            is RootConfig.Splash -> {
+                RootComponent.RootChild.SplashRoot(
+                    splashScreenFactory.create(
+                        componentContext = componentContext,
+                        onNavigateTo = { location ->
+                            navigateToHomeScreen(location)
+                        }
+                    )
                 )
-            )
+            }
 
             is RootConfig.Main -> {
-                println("CREATING CHILD 2 === ")
                 RootComponent.RootChild.MainRoot(
                     homeScreenFactory.create(componentContext = context, onNavigateTo = {})
                 )

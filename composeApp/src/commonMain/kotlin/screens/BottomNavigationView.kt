@@ -68,6 +68,8 @@ import screens.SelectLocationScreen.SelectLocationScreen
 
                           val tabStack by component.tabStack.subscribeAsState()
 
+
+
                           CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme) {
                               CupertinoNavigationBar(isTranslucent = false) {
                                   TabComponent.Tab.values().forEach { specificTab ->
