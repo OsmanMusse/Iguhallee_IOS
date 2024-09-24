@@ -1,13 +1,7 @@
 package decompose.splash
 
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.value.MutableValue
-import com.arkivanov.decompose.value.Value
-import com.arkivanov.decompose.value.update
 import com.arkivanov.essenty.lifecycle.coroutines.coroutineScope
-import decompose.detail.PostDetailComponent
-import decompose.home.HomeScreenComponent
-import decompose.home.TabComponent
 import domain.repository.preferences.AppPreferencesRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

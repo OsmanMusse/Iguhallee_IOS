@@ -3,8 +3,6 @@ package di
 import app.cash.paging.PagingConfig
 import util.Constants
 import decompose.home.HomeListComponent
-import decompose.home.HomeScreenComponent
-import decompose.home.TabComponent
 import decompose.root.DefaultRootComponent
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
@@ -13,8 +11,10 @@ import domain.repository.post.PostRepositoryImpl
 import domain.repository.user.UserRepository
 import domain.repository.user.UserRespository_Impl
 import decompose.detail.PostDetailComponent
+import decompose.home.DefaultHomeScreenComponent
 import decompose.landing.DefaultLandingComponent
 import decompose.splash.DefaultSplashComponent
+import decompose.tab.DefaultTabComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.dsl.module
@@ -77,12 +77,12 @@ val commonModule = module {
 
 
     single {
-        TabComponent.Factory(homeListFactory = get())
+        DefaultTabComponent.Factory(homeListFactory = get())
     }
 
 
     single {
-        HomeScreenComponent.Factory(
+        DefaultHomeScreenComponent.Factory(
             tabFactory = get(),
             postDetailFactory = get()
         )

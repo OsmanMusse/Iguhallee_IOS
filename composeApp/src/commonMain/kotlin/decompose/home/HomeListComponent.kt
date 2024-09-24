@@ -25,7 +25,6 @@ class HomeListComponent(
     private val _state = MutableValue(HomeScreenState())
 
     private val componentScope = coroutineScope()
-
     val state: Value<HomeScreenState> get() =  _state
 
     // Paging

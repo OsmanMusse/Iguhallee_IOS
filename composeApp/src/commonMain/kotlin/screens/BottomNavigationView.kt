@@ -20,7 +20,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetbrains.subscribeAsState
 import com.ramaas.iguhallee.MR
 import decompose.home.HomeScreenComponent
-import decompose.home.TabComponent
+import decompose.tab.TabComponent
 import dev.icerock.moko.resources.compose.painterResource
 import util.NoRippleTheme
 import kotlinx.coroutines.launch
@@ -36,7 +36,6 @@ import kotlinx.coroutines.CoroutineScope
 import screens.PostDetailScreen.PostDetailScreen
 import screens.SelectLocationScreen.SelectLocationScreen
 
-
 @OptIn(ExperimentalCupertinoApi::class, ExperimentalDecomposeApi::class)
  @Composable
  fun BottomNavigationView(
@@ -47,18 +46,19 @@ import screens.SelectLocationScreen.SelectLocationScreen
 
 
      Children(
-         stack = component.fullScreenStack,
+         stack = component.fullscreenStack,
          modifier = Modifier.fillMaxSize(),
          animation = cupertinoPredictiveBackAnimation(
              backHandler = component.backHandler,
              onBack = {
                  println("DO BACK GESTURE ===")
-                 component.onBack()
+                 component.onBackPress()
              }
          ),
      ) {
-         when(val instance = it.instance) {
-              is HomeScreenComponent.FullScreenChild.None -> {
+         when(val child = it.instance) {
+             is HomeScreenComponent.Child.None -> Unit
+              is HomeScreenComponent.Child.TabChild -> {
                   CupertinoBottomSheetScaffold(
                       modifier = Modifier.fillMaxSize(),
                       scaffoldState = CupertinoBottomSheetScaffoldState(bottomSheetState),
@@ -66,19 +66,16 @@ import screens.SelectLocationScreen.SelectLocationScreen
                           val grayTitleColor = Color(158, 158, 158)
                           val primaryColor = Color(72, 134, 255)
 
-                          val tabStack by component.tabStack.subscribeAsState()
-
-
 
                           CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme) {
                               CupertinoNavigationBar(isTranslucent = false) {
                                   TabComponent.Tab.values().forEach { specificTab ->
                                       val (title, icon) = when (specificTab) {
-                                          TabComponent.Tab.Home -> "Home" to MR.images.home_icon_lineal
-                                          TabComponent.Tab.Account -> "Account" to MR.images.account_icon
-                                          TabComponent.Tab.Post -> "Post" to MR.images.camera_icon_linear
-                                          TabComponent.Tab.Saved -> "Saved" to MR.images.favourite_icon
-                                          TabComponent.Tab.Settings -> "Settings" to MR.images.setting_icon_linear
+                                          TabComponent.Tab.Home -> specificTab.name to MR.images.home_icon_lineal
+                                          TabComponent.Tab.Account -> specificTab.name to MR.images.account_icon
+                                          TabComponent.Tab.Post -> specificTab.name to MR.images.camera_icon_linear
+                                          TabComponent.Tab.Saved -> specificTab.name to MR.images.favourite_icon
+                                          TabComponent.Tab.Settings -> specificTab.name to MR.images.setting_icon_linear
                                       }
 
                                       val bottomTabsOffset = when (specificTab) {
@@ -98,14 +95,13 @@ import screens.SelectLocationScreen.SelectLocationScreen
                                               )
                                           },
                                           onClick = {
-                                              component.onTabSelected(tab = specificTab)
+                                              child.component.onTabSelected(specificTab)
                                           },
                                           selected = false,
                                           label = {
                                               Text(
                                                   text = "${title}",
                                                   fontSize = 12.5.sp,
-                                                  color = if (tabStack.active.instance.tab == specificTab) primaryColor else grayTitleColor
                                               )
                                           }
                                       )
@@ -136,18 +132,20 @@ import screens.SelectLocationScreen.SelectLocationScreen
 
                       },
                   ) {
+                      val tabStack by child.component.stack.subscribeAsState()
+                      println("CURRENT TAB STACK == ${tabStack}")
                       Children(
-                          stack = component.tabStack,
+                          stack = tabStack,
                           modifier = Modifier,
-                      ) { child ->
-                          TabView(child.instance)
+                      ) {
+                          TabView(child.component)
                       }
                   }
               }
-              is HomeScreenComponent.FullScreenChild.PostScreen ->  {
-                  PostDetailScreen(instance.component)
+              is HomeScreenComponent.Child.PostScreen ->  {
+                  PostDetailScreen(child.component)
               }
-              is HomeScreenComponent.FullScreenChild.SelectLocationScreen -> SelectLocationScreen(instance.component)
+              is HomeScreenComponent.Child.SelectLocationScreen -> SelectLocationScreen(child.component)
          }
        }
 

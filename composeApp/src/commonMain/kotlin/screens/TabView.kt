@@ -3,7 +3,7 @@ package screens
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
-import decompose.home.TabComponent
+import decompose.tab.TabComponent
 
 @Composable
 fun TabView(component: TabComponent, modifier: Modifier = Modifier){
@@ -14,8 +14,8 @@ fun TabView(component: TabComponent, modifier: Modifier = Modifier){
     ){
         println("Active TabView == ${it.instance}")
         when(val child = it.instance){
-            is TabComponent.Child.Main.Home -> HomeListView(child.component)
-            is TabComponent.Child.Main.Saved -> SavedListView(child.component)
+            is TabComponent.Child.Home -> HomeListView(child.component)
+            is TabComponent.Child.Saved -> SavedListView(child.component)
             else -> Unit
         }
     }

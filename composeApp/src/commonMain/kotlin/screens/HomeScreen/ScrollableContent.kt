@@ -83,7 +83,6 @@ fun ScrollableContent(
 
     val refreshState = pagingPosts.loadState.refresh is LoadStateLoading
 
-
     LaunchedEffect(state.currentCity){
         println("REFRESH STATE WHEN STATE CHANGE === ${refreshState}")
         if (!state.isInitialLoad) {
@@ -204,8 +203,7 @@ fun ScrollableMainContent(
                 onClick = {
                     onclick(index)
                 }
-            )
-            ,
+            ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(3.dp),
         elevation = CardDefaults.cardElevation(2.dp)
@@ -220,7 +218,6 @@ fun ScrollableMainContent(
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxWidth().height(175.dp).padding(8.dp),
             onState = { it.painter},
-
         )
         Text(
             modifier = Modifier

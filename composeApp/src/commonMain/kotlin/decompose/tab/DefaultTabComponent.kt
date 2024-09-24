@@ -1,30 +1,32 @@
-package decompose.home
+package decompose.tab
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.active
+import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
+import decompose.home.HomeListComponent
 import kotlinx.serialization.Serializable
 import screens.AccountScreen.AccountComponent
 
-class TabComponent(
+class DefaultTabComponent(
     componentContext: ComponentContext,
-    val tab: Tab,
     private val homeListFactory: HomeListComponent.Factory,
     private val onNavigatePost: (postID:String) -> Unit,
     private val onNavigateLocation: (location: String) -> Unit
-): ComponentContext by componentContext {
+): TabComponent,ComponentContext by componentContext {
 
     init {
-        println("HELLO TAB COMPONENT CREATED === ${tab} ")
+        println("HELLO TAB COMPONENT CREATED ===")
     }
 
 
     fun onLocationChecked(location: String) {
-        (_stack.active.instance as Child.Main.Home).component.updateLocation(location)
+        (_stack.active.instance as TabComponent.Child.Home).component.updateLocation(location)
     }
 
     private val navigation = StackNavigation<Config>()
@@ -32,34 +34,42 @@ class TabComponent(
     private val _stack =
         childStack(
             source = navigation,
-            initialConfiguration = Config.Main(tab = tab),
+            initialConfiguration = Config.Home,
             handleBackButton = true,
             childFactory = ::child,
         )
 
-    val stack: Value<ChildStack<*, Child>> get() = _stack
+    override val stack: Value<ChildStack<*, TabComponent.Child>> get() = _stack
+
+    override fun onTabSelected(tab: TabComponent.Tab){
+        println("Tab selected == $tab")
+
+        navigation.navigate { stack ->
+             stack.filterNot {  it == Config.Saved } + Config.Saved
+        }
+    }
 
 
-    private fun child(config: Config, componentContext: ComponentContext): Child {
+    private fun child(config: Config, componentContext: ComponentContext): TabComponent.Child {
         return when (config) {
-            is Config.Main ->  {
-                println("Main Child Selected === ${config.tab}")
+            is Config.Home ->  {
+                println("Main Child Selected === ${config}")
                 mainChild(config, componentContext)
             }
             else -> {
                 println("${_stack.value} Child Selected ===")
-                mainChild (config as Config.Main, componentContext)
+                mainChild (config, componentContext)
             }
         }
     }
 
-    private fun mainChild(config: Config.Main, componentContext: ComponentContext): Child {
-        return when (config.tab) {
-            Tab.Home -> Child.Main.Home(homeChild(componentContext))
-            Tab.Account -> Child.Main.Home(homeChild(componentContext))
-            Tab.Post -> Child.Main.Home(homeChild(componentContext))
-            Tab.Saved -> Child.Main.Saved(savedChild(componentContext))
-            Tab.Settings -> Child.Main.Home(homeChild(componentContext))
+    private fun mainChild(config: Config, componentContext: ComponentContext): TabComponent.Child {
+        return when (config) {
+            Config.Home -> TabComponent.Child.Home(homeChild(componentContext))
+            Config.Account -> TabComponent.Child.Home(homeChild(componentContext))
+            Config.Post -> TabComponent.Child.Home(homeChild(componentContext))
+            Config.Saved -> TabComponent.Child.Saved(savedChild(componentContext))
+            Config.Settings -> TabComponent.Child.Home(homeChild(componentContext))
         }
     }
 
@@ -77,28 +87,22 @@ class TabComponent(
 
 
 
-    // Think of them as your equivalent to viewmodels that each of your screen takes AKA Components
-    sealed interface Child {
-        sealed interface Main: Child {
-            class Home(val component: HomeListComponent): Main
-            class Account(val component: AccountComponent): Main
-            class Post(val component: AccountComponent): Main
-            class Saved(val component: AccountComponent): Main
-            class Settings(val component: AccountComponent): Main
-        }
 
-    }
-
-    enum class Tab {
-        Home, Account, Post, Saved, Settings;
-    }
-
-
-    /// The set of parameters or argument that we pass to a specific screen
+    /**
+     * Config providing type safe arguments, as well as any kind of dependencies to child components.
+     */
     @Serializable
     private sealed interface Config: Parcelable {
         @Serializable
-        data class Main(val tab: Tab): Config
+       data object Home: Config
+        @Serializable
+        data object Account: Config
+        @Serializable
+        data object Post: Config
+        @Serializable
+        data object Saved: Config
+        @Serializable
+        data object Settings: Config
     }
 
     class Factory(
@@ -107,12 +111,10 @@ class TabComponent(
 
         fun create(
             componentContext: ComponentContext,
-            tab: Tab,
             onNavigatePost: (postID:String) -> Unit,
             onNavigateLocation: (location: String) -> Unit
-        ): TabComponent = TabComponent(
+        ): TabComponent = DefaultTabComponent(
             componentContext = componentContext,
-            tab = tab,
             homeListFactory = homeListFactory,
             onNavigatePost = onNavigatePost,
             onNavigateLocation = onNavigateLocation

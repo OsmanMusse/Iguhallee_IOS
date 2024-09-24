@@ -1,154 +1,22 @@
 package decompose.home
 
-
-import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
-import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.active
-import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.navigate
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.parcelable.Parcelable
-import domain.model.HomeScreenState
-import kotlinx.serialization.Serializable
+import com.arkivanov.essenty.backhandler.BackHandler
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import decompose.detail.PostDetailComponent
-import decompose.location.DefaultSelectLocationComponent
 import decompose.location.SelectLocationComponent
+import decompose.tab.TabComponent
+
+interface HomeScreenComponent: BackHandlerOwner {
+    val fullscreenStack: Value<ChildStack<*, Child>>
+    fun onBackPress()
 
 
-class HomeScreenComponent(
-    private val tabFactory: TabComponent.Factory,
-    private val postDetailFactory: PostDetailComponent.Factory,
-    private val componentContext: ComponentContext,
-    private val onNavigateTo: (String) -> Unit
-):ComponentContext by componentContext {
-
-    init {
-        println("HI THE H COMPONENT HAS BEEN CREATED")
+    sealed class Child {
+        object None: Child()
+        class TabChild(val component: TabComponent): Child()
+        class PostScreen(val component: PostDetailComponent): Child()
+        class SelectLocationScreen(val component: SelectLocationComponent): Child()
     }
-
-
-    private val _state = MutableValue(HomeScreenState())
-    val state = _state
-
-
-    private val mainNavigation = StackNavigation<MainConfig>()
-    private val tabNavigation = StackNavigation<TabConfig>()
-
-
-    private val _fullscreenStack =
-        childStack(
-            source = mainNavigation,
-            initialConfiguration = MainConfig.None,
-            serializer = MainConfig.serializer(),
-            key = "fullscreen",
-            handleBackButton = true,
-            childFactory = ::createFullScreenChild
-        )
-    private val _tabStack =
-        childStack(
-            source = tabNavigation,
-            initialConfiguration = TabConfig(TabComponent.Tab.Home),
-            key = "tabs",
-            handleBackButton = true,
-            childFactory = ::createTab,
-        )
-
-
-    val fullScreenStack: Value<ChildStack<*, FullScreenChild>> get() = _fullscreenStack
-    val tabStack: Value<ChildStack<*, TabComponent>> get() = _tabStack
-
-
-    fun onBack(){
-        println("DO BACK GESTURE 2 ===")
-        mainNavigation.pop()
-    }
-
-    fun onTabSelected(tab: TabComponent.Tab){
-        println("Tab selected == $tab")
-        tabNavigation.navigate { stack ->
-            stack.filterNot { it.tab == tab } + TabConfig(tab)
-        }
-    }
-
-
-    private fun createFullScreenChild(config: MainConfig, componentContext: ComponentContext): FullScreenChild {
-        return when(config){
-            is MainConfig.None -> FullScreenChild.None
-            is MainConfig.PostScreen -> FullScreenChild.PostScreen(postDetailComponent(config,componentContext))
-            is MainConfig.LocationScreen -> FullScreenChild.SelectLocationScreen(selectLocationComponent(config,componentContext))
-        }
-    }
-
-    private fun postDetailComponent(config: MainConfig.PostScreen,componentContext: ComponentContext): PostDetailComponent {
-        return postDetailFactory.create(
-            postID = config.postID.toLong(),
-            componentContext = componentContext,
-            onGoBack = { mainNavigation.pop() }
-        )
-    }
-
-    private fun selectLocationComponent(config: MainConfig.LocationScreen,componentContext: ComponentContext): SelectLocationComponent {
-        return DefaultSelectLocationComponent(
-            componentContext = componentContext,
-            currentLocation = config.location,
-            onGoBack = { location ->
-                mainNavigation.pop {
-                    if (location != null) (tabStack.active.instance).onLocationChecked(location)
-                }
-            }
-        )
-    }
-    private fun createTab(config: TabConfig, componentContext: ComponentContext): TabComponent {
-        return tabFactory.create(
-            componentContext = componentContext,
-            tab = config.tab,
-            onNavigatePost = { postID ->
-                mainNavigation.push(MainConfig.PostScreen(postID))
-            },
-            onNavigateLocation = { location ->
-                mainNavigation.push(MainConfig.LocationScreen(location))
-            }
-        )
-    }
-
-
-    class Factory(
-        private val tabFactory: TabComponent.Factory,
-        private val postDetailFactory: PostDetailComponent.Factory
-    ){
-        fun create(
-            componentContext: ComponentContext,
-            onNavigateTo: (String) -> Unit,
-        ) = HomeScreenComponent(
-            componentContext = componentContext,
-            onNavigateTo = onNavigateTo,
-            tabFactory = tabFactory,
-            postDetailFactory = postDetailFactory
-        )
-    }
-
-
-
-    sealed interface FullScreenChild {
-        object None: FullScreenChild
-        class PostScreen(val component: PostDetailComponent): FullScreenChild
-        class SelectLocationScreen(val component: SelectLocationComponent): FullScreenChild
-    }
-    @Serializable
-    sealed interface MainConfig: Parcelable {
-        @Serializable
-        data object None: MainConfig
-        @Serializable
-        data class PostScreen(val postID: String): MainConfig
-
-        @Serializable
-        data class LocationScreen(val location: String): MainConfig
-    }
-
-    @Serializable
-    private data class TabConfig(val tab: TabComponent.Tab): Parcelable
 }
