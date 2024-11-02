@@ -1,4 +1,4 @@
-package screens
+package ui.tabs.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

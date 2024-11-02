@@ -24,13 +24,12 @@ import io.github.alexzhirkevich.cupertino.CupertinoScaffold
 import io.github.alexzhirkevich.cupertino.CupertinoText
 import io.github.alexzhirkevich.cupertino.CupertinoTopAppBar
 import io.github.alexzhirkevich.cupertino.CupertinoTopAppBarDefaults
-import io.github.alexzhirkevich.cupertino.ExperimentalCupertinoApi
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import screens.home.MainScreen
+import ui.MainScreen
 
 
-@OptIn(ExperimentalCupertinoApi::class)
+
 @Composable
 @Preview
 fun App(rootComponent: RootComponent) {
@@ -45,15 +44,12 @@ fun App(rootComponent: RootComponent) {
         content = { child ->
             println("Child Created == ")
            when(val childCreated = child.instance){
-
                is RootComponent.RootChild.SplashRoot -> Unit
                is RootComponent.RootChild.MainRoot -> MainScreen(childCreated.mainComponent)
                is RootComponent.RootChild.LandingRoot -> {
                    OnBoardingSelectLocation(
                        component = childCreated.landingComponent,
-                       onLocationSelect = {  location ->
-                           rootComponent.navigateToHomeScreen(selectedLocation = location)
-                       }
+                       onLocationSelect = { rootComponent.navigateToHomeScreen(it) }
                    )
                }
            }

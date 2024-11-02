@@ -57,7 +57,7 @@ kotlin {
             implementation("io.coil-kt.coil3:coil-core:3.0.0-alpha06")
             implementation("io.coil-kt.coil3:coil-compose-core:3.0.0-alpha06")
             implementation("io.coil-kt.coil3:coil-network-ktor:3.0.0-alpha06")
-            implementation("io.github.alexzhirkevich:cupertino:0.1.0-alpha03")
+            implementation("io.github.alexzhirkevich:cupertino:0.1.0-alpha04")
             implementation("io.github.alexzhirkevich:cupertino-decompose:0.1.0-alpha03")
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
             implementation("dev.gitlive:firebase-firestore:1.12.0")

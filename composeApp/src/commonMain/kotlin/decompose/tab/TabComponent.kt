@@ -11,17 +11,16 @@ interface TabComponent {
 
     fun onTabSelected(tab: TabComponent.Tab)
 
+    enum class Tab {
+        Home, Account, Sell, Saved, Settings;
+    }
 
     sealed interface Child {
             class Home(val component: HomeListComponent): Child
             class Account(val component: AccountComponent): Child
-            class Post(val component: AccountComponent): Child
+            class Sell(val component: AccountComponent): Child
             class Saved(val component: AccountComponent): Child
             class Settings(val component: AccountComponent): Child
     }
 
-    enum class Tab {
-        Home, Account, Post, Saved, Settings;
-
-    }
 }

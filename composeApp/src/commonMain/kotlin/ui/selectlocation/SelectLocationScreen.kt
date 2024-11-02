@@ -1,4 +1,4 @@
-package screens.selectlocation
+package ui.selectlocation
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,6 +24,7 @@ import com.ramaas.iguhallee.MR
 import decompose.location.SelectLocationComponent
 import dev.icerock.moko.resources.compose.painterResource
 import io.github.alexzhirkevich.cupertino.CupertinoDivider
+import io.github.alexzhirkevich.cupertino.CupertinoHorizontalDivider
 import io.github.alexzhirkevich.cupertino.CupertinoScaffold
 import io.github.alexzhirkevich.cupertino.CupertinoText
 import screens.selectlocation.components.CustomTopAppBar
@@ -51,14 +52,16 @@ fun SelectLocationScreen(component: SelectLocationComponent) {
                 items(listItem){ location ->
                     Box(
                         modifier = Modifier
+                            .height(60.dp)
+                            .padding(start = 10.dp)
                             .clickable(
                                 interactionSource = MutableInteractionSource(),
                                 indication = rememberRipple(),
-                                onClick = { component.onBackClick(location) }
+                                onClick = {
+                                    println("Location Selected == $location")
+                                    component.onBackClick(location)
+                                }
                             )
-                            .padding(start = 10.dp)
-                            .height(60.dp),
-
                     ){
                         CupertinoText(
                             modifier = Modifier.align(Alignment.CenterStart),
@@ -80,7 +83,7 @@ fun SelectLocationScreen(component: SelectLocationComponent) {
                             )
                         }
 
-                        CupertinoDivider(
+                        CupertinoHorizontalDivider(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.BottomStart)

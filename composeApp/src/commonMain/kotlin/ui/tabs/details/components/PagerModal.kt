@@ -40,7 +40,6 @@ fun PagerModal(
     listOfImages: List<String>?
 ) {
 
-
     val currentPagerPosition = remember { mutableIntStateOf(1) }
     val pagerState = rememberPagerState(0,0F, pageCount = {listOfImages?.size ?: 1})
 

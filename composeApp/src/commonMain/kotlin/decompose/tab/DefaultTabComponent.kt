@@ -63,7 +63,7 @@ class DefaultTabComponent(
 
     private fun createAccountChild(componentContext: ComponentContext) = TabComponent.Child.Account(accountChild(componentContext))
 
-    private fun createPostChild(componentContext: ComponentContext) = TabComponent.Child.Post(postChild(componentContext))
+    private fun createPostChild(componentContext: ComponentContext) = TabComponent.Child.Sell(postChild(componentContext))
 
     private fun createSavedChild(componentContext: ComponentContext) = TabComponent.Child.Saved(savedChild(componentContext))
 
@@ -97,7 +97,7 @@ class DefaultTabComponent(
     private fun TabComponent.Tab.toConfig(): Config = when (this) {
         TabComponent.Tab.Home -> Config.Home
         TabComponent.Tab.Account -> Config.Account
-        TabComponent.Tab.Post -> Config.Post
+        TabComponent.Tab.Sell -> Config.Post
         TabComponent.Tab.Saved -> Config.Saved
         TabComponent.Tab.Settings -> Config.Settings
     }

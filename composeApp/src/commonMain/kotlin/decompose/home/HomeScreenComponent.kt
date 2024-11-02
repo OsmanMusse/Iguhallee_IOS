@@ -14,7 +14,7 @@ interface HomeScreenComponent: BackHandlerOwner {
 
 
     sealed class Child {
-        object None: Child()
+        data object None: Child()
         class TabChild(val component: TabComponent): Child()
         class PostScreen(val component: PostDetailComponent): Child()
         class SelectLocationScreen(val component: SelectLocationComponent): Child()

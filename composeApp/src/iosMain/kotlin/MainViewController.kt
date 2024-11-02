@@ -1,19 +1,15 @@
 
-import androidx.compose.ui.window.ComposeUIViewController
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.ComposeUIViewController
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.PredictiveBackGestureOverlay
+import com.arkivanov.decompose.lifecycle.ApplicationLifecycle
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import decompose.root.DefaultRootComponent
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
-import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.lifecycle.ApplicationLifecycle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import org.koin.compose.getKoin
-import platform.UIKit.UIApplication
 
 
 @OptIn(ExperimentalDecomposeApi::class)

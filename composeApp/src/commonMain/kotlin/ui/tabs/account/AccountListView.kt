@@ -8,8 +8,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,30 +22,22 @@ fun AccountListView(component: AccountComponent){
     println("Account Component Hashcode == ${component.hashCode()}")
     val model by component.model.subscribeAsState()
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Red)
-
     ){
-        Text(
-            modifier = Modifier
-                .align(Alignment.Center),
-            text = model.text
-        )
+        Text(modifier = Modifier.align(Alignment.Center), text = model.text)
 
         Button(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(top = 60.dp),
+            modifier = Modifier.align(Alignment.Center).padding(top = 60.dp),
             onClick = {
                 component.updateText("Update btn was clicked")
             }
         ){
-            Text(
-                text = "Update text"
-            )
+            Text(text = "Update text")
         }
     }
+
+
 }

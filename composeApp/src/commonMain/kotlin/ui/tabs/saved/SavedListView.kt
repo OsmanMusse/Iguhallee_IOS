@@ -1,4 +1,4 @@
-package screens
+package screens.saved
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

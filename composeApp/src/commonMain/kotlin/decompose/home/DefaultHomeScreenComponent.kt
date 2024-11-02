@@ -4,22 +4,19 @@ package decompose.home
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.backhandler.BackHandler
 import com.arkivanov.essenty.parcelable.Parcelable
-import domain.model.HomeScreenState
-import kotlinx.serialization.Serializable
 import decompose.detail.PostDetailComponent
 import decompose.location.DefaultSelectLocationComponent
 import decompose.location.SelectLocationComponent
 import decompose.tab.DefaultTabComponent
 import decompose.tab.TabComponent
+import domain.model.HomeScreenState
+import kotlinx.serialization.Serializable
 
 
 class DefaultHomeScreenComponent(
@@ -59,9 +56,6 @@ class DefaultHomeScreenComponent(
         println("DO BACK GESTURE 2 ===")
         mainNavigation.pop()
     }
-
-
-
 
     private fun createFullScreenChild(config: Config, componentContext: ComponentContext): HomeScreenComponent.Child {
         return when(config){

@@ -20,12 +20,12 @@ class HomeListComponent(
     componentContext: ComponentContext,
     private val onPushScreen: (String) -> Unit,
     private val onPushLocationScreen: (String) -> Unit
-): ComponentContext by componentContext {
+) : ComponentContext by componentContext {
 
     private val _state = MutableValue(HomeScreenState())
 
     private val componentScope = coroutineScope()
-    val state: Value<HomeScreenState> get() =  _state
+    val state: Value<HomeScreenState> get() = _state
 
     // Paging
 
@@ -34,7 +34,7 @@ class HomeListComponent(
 
 
     init {
-       println("HOMELIST COMPONENT CREATED")
+        println("HOMELIST COMPONENT CREATED")
         retrieveLikedPost()
         retrievePosts()
         observeLikedPosts()
@@ -45,13 +45,13 @@ class HomeListComponent(
         _state.value = _state.value.copy(currentCity = location)
     }
 
-    fun refreshPosts() =  retrievePosts()
+    fun refreshPosts() = retrievePosts()
 
     fun emptyPagingData() {
         _posts.value = PagingData.empty()
     }
 
-    private fun observeLikedPosts(){
+    private fun observeLikedPosts() {
         componentScope.launch {
             repo.getAllLikedPosts().collect { newList ->
                 _state.value = _state.value.copy(bookmarkedPosts = newList)
@@ -60,17 +60,6 @@ class HomeListComponent(
         }
     }
 
-    fun unsavePost(postID: Long){
-        componentScope.launch {
-            repo.deleteLikedPost(postID)
-        }
-    }
-
-     fun savePost(postID: Long){
-        componentScope.launch {
-            repo.saveLikedPost(postID)
-        }
-    }
 
     fun goToDetailsScreen(postID: Long?) {
         onPushScreen("${postID}")
@@ -81,36 +70,37 @@ class HomeListComponent(
     }
 
 
-    private fun retrieveLikedPost(){
+    private fun retrieveLikedPost() {
         componentScope.launch {
             repo.getAllLikedPosts().collect {
-               _state.value = _state.value.copy(bookmarkedPosts = it)
+                _state.value = _state.value.copy(bookmarkedPosts = it)
             }
         }
     }
-    private fun retrievePosts(){
+
+    private fun retrievePosts() {
         val location = _state.value.currentCity
         println("CALL RETRIEVE POST === ${location}")
-       componentScope.launch {
-           repo.getAllPosts(location).cachedIn(componentScope).collect { pagingData ->
-              _posts.value = pagingData
-           }
-       }
+        componentScope.launch {
+            repo.getAllPosts(location).cachedIn(componentScope).collect { pagingData ->
+                _posts.value = pagingData
+            }
+        }
     }
 
 
- class Factory(
-    private val repo: PostRepository
- ){
-    fun create(
-        componentContext: ComponentContext,
-        onPushScreen: (String) -> Unit,
-        onPushLocationScreen: (String) -> Unit
-    ): HomeListComponent = HomeListComponent(
-        componentContext = componentContext,
-        repo = repo,
-        onPushScreen = onPushScreen,
-        onPushLocationScreen = onPushLocationScreen
-    )
-  }
- }
+    class Factory(
+        private val repo: PostRepository
+    ) {
+        fun create(
+            componentContext: ComponentContext,
+            onPushScreen: (String) -> Unit,
+            onPushLocationScreen: (String) -> Unit
+        ): HomeListComponent = HomeListComponent(
+            componentContext = componentContext,
+            repo = repo,
+            onPushScreen = onPushScreen,
+            onPushLocationScreen = onPushLocationScreen
+        )
+    }
+}
